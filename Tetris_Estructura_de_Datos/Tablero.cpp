@@ -220,13 +220,7 @@ void Tablero::dibujar(int xInicial, int yInicial, int tamCelda) const
 			// Linea de la cuadricula
 			//--------------------------------------------------
 			
-			DrawRectangleLines(
-							   x,
-							   y,
-							   tamCelda,
-							   tamCelda,
-							   Color{65, 68, 78, 255}
-							   );
+			DrawRectangleLines(x, y, tamCelda, tamCelda, Color{65, 68, 78, 255});
 		}
 		
 		actual = actual->siguiente;
