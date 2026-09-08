@@ -1,4 +1,7 @@
+#ifndef PIEZA_H
 #define PIEZA_H
+
+#include "Tablero.h"
 
 enum TipoPieza
 {
@@ -14,24 +17,43 @@ enum TipoPieza
 struct Pieza
 {
 	TipoPieza tipo;
-	
+
 	int x;
 	int y;
-	
+
 	int rotacion;
 };
 
-// Crea una pieza en la posicion inicial
+// Crear una pieza
 Pieza crearPieza(TipoPieza tipo);
 
-// Devuelven la posicion de cada uno de los 4 bloques
-int obtenerXBloque(const Pieza& pieza, int bloque);
-int obtenerYBloque(const Pieza& pieza, int bloque);
+// Obtener posicion de cada bloque
+int obtenerXBloque(const Pieza &pieza, int bloque);
 
-// Dibuja la pieza usando raylib
+int obtenerYBloque(const Pieza &pieza, int bloque);
+
+// Dibujar pieza
 void dibujarPieza(
-				  const Pieza& pieza,
-				  int xTablero,
-				  int yTablero,
-				  int tamCelda
-				  );
+	const Pieza &pieza,
+	int xTablero,
+	int yTablero,
+	int tamCelda);
+
+// --------------------------------------------------
+// Movimiento y colisiones
+// --------------------------------------------------
+
+bool posicionValida(
+	const Pieza &pieza,
+	const Tablero &tablero);
+
+bool moverPieza(
+	Pieza &pieza,
+	int movimientoX,
+	int movimientoY,
+	const Tablero &tablero);
+
+bool rotarPieza(
+	Pieza &pieza,
+	const Tablero &tablero);
+#endif
