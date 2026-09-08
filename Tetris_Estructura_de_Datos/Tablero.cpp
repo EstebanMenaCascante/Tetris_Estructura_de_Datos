@@ -1,9 +1,6 @@
 #include "Tablero.h"
 #include "raylib.h"
 
-//------------------------------------------------------
-// Constructor del nodo
-//------------------------------------------------------
 Tablero::NodoFila::NodoFila()
 {
 	siguiente = nullptr;
@@ -15,12 +12,9 @@ Tablero::NodoFila::NodoFila()
 }
 
 
-//------------------------------------------------------
-// Constructor del tablero
-//------------------------------------------------------
 Tablero::Tablero()
 {
-	cabeza = nullptr;
+	primero = nullptr;
 	
 	NodoFila* ultimo = nullptr;
 	
@@ -29,9 +23,9 @@ Tablero::Tablero()
 	{
 		NodoFila* nuevaFila = new NodoFila();
 		
-		if (cabeza == nullptr)
+		if (primero == nullptr)
 		{
-			cabeza = nuevaFila;
+			primero = nuevaFila;
 		}
 		else
 		{
@@ -48,7 +42,7 @@ Tablero::Tablero()
 //------------------------------------------------------
 Tablero::~Tablero()
 {
-	NodoFila* actual = cabeza;
+	NodoFila* actual = primero;
 	
 	while (actual != nullptr)
 	{
@@ -59,7 +53,7 @@ Tablero::~Tablero()
 		delete eliminar;
 	}
 	
-	cabeza = nullptr;
+	primero = nullptr;
 }
 
 
@@ -73,7 +67,7 @@ Tablero::NodoFila* Tablero::obtenerFila(int numeroFila) const
 		return nullptr;
 	}
 	
-	NodoFila* actual = cabeza;
+	NodoFila* actual = primero;
 	
 	int contador = 0;
 	
@@ -92,7 +86,7 @@ Tablero::NodoFila* Tablero::obtenerFila(int numeroFila) const
 //------------------------------------------------------
 void Tablero::reiniciar()
 {
-	NodoFila* actual = cabeza;
+	NodoFila* actual = primero;
 	
 	while (actual != nullptr)
 	{
@@ -128,8 +122,7 @@ void Tablero::colocarCelda(int fila, int columna, int valor)
 //------------------------------------------------------
 // Consultar una celda
 //------------------------------------------------------
-int Tablero::obtenerCelda(int fila,
-						  int columna) const
+int Tablero::obtenerCelda(int fila, int columna) const
 {
 	if (columna < 0 || columna >= COLUMNAS)
 	{
@@ -146,13 +139,103 @@ int Tablero::obtenerCelda(int fila,
 	return nodoFila->celdas[columna];
 }
 
+bool Tablero::filaCompleta(int fila) const
+{
+	NodoFila* nodoFila = obtenerFila(fila);
+	
+	if (nodoFila == nullptr)
+	{
+		return false;
+	}
+	
+	for (int columna = 0; columna < COLUMNAS; columna++)
+	{
+		if (nodoFila->celdas[columna] == 0)
+		{
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+void Tablero::eliminarFila(int fila)
+{
+	if (fila < 0 || fila >= FILAS || primero == nullptr)
+	{
+		return;
+	}
+	
+	// Si queremos eliminar la primera fila
+	if (fila == 0)
+	{
+		NodoFila* eliminar = primero;
+		
+		primero = primero->siguiente;
+		
+		delete eliminar;
+		
+		return;
+	}
+	
+	NodoFila* anterior = primero;
+	
+	// Llegamos al nodo anterior al que queremos eliminar
+	for (int i = 0; i < fila - 1; i++)
+	{
+		anterior = anterior->siguiente;
+	}
+	
+	NodoFila* eliminar = anterior->siguiente;
+	
+	anterior->siguiente = eliminar->siguiente;
+	
+	delete eliminar;
+}
+
+void Tablero::insertarFilaVaciaInicio()
+{
+	NodoFila* nuevaFila = new NodoFila();
+	
+	nuevaFila->siguiente = primero;
+	
+	primero = nuevaFila;
+}
+
+int Tablero::limpiarFilas()
+{
+	int eliminadas = 0;
+	
+	int fila = FILAS - 1;
+	
+	while (fila >= 0)
+	{
+		if (filaCompleta(fila))
+		{
+			eliminarFila(fila);
+			
+			insertarFilaVaciaInicio();
+			
+			eliminadas++;
+			
+			// No bajamos de fila todavía.
+			// La fila superior acaba de caer a esta posición.
+		}
+		else
+		{
+			fila--;
+		}
+	}
+	
+	return eliminadas;
+}
 
 //------------------------------------------------------
 // Dibujar el tablero usando raylib
 //------------------------------------------------------
 void Tablero::dibujar(int xInicial, int yInicial, int tamCelda) const
 {
-	NodoFila* actual = cabeza;
+	NodoFila* actual = primero;
 	
 	int fila = 0;
 	

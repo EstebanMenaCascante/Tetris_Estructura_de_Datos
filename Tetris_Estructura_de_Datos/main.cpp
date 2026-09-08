@@ -1,5 +1,6 @@
 #include<iostream>
 #include "Tablero.h"
+#include "Pieza.h"
 #include "raylib.h"
 #include <cmath>
 using namespace std;
@@ -19,22 +20,9 @@ int main (int argc, char *argv[]) {
 	Tablero tablero;
 	
 	
-	//--------------------------------------------------
-	// Bloques temporales solamente para probar
-	// que la lista y el dibujo funcionan.
-	//--------------------------------------------------
+	// Crear primera pieza
+	Pieza piezaActual = crearPieza(T);
 	
-	tablero.colocarCelda(19, 2, 1);
-	tablero.colocarCelda(19, 3, 1);
-	tablero.colocarCelda(19, 4, 1);
-	tablero.colocarCelda(19, 5, 1);
-	
-	tablero.colocarCelda(18, 4, 3);
-	tablero.colocarCelda(18, 5, 3);
-	
-	tablero.colocarCelda(17, 5, 4);
-	
-	tablero.colocarCelda(16, 5, 5);
 	
 	
 	//--------------------------------------------------
@@ -62,6 +50,8 @@ int main (int argc, char *argv[]) {
 		//--------------------------------------------------
 		
 		tablero.dibujar(320, 60, 28);// X, Y, Tamano de cada celda
+		
+		dibujarPieza(piezaActual,320,60,28);
 						
 		
 		
