@@ -19,9 +19,7 @@ private:
 
 	NodoFila *obtenerFila(int numeroFila) const;
 
-	bool filaCompleta(int fila) const;
-	void eliminarFila(int fila);
-	void insertarFilaVaciaInicio();
+	
 
 public:
 	Tablero();
@@ -39,6 +37,10 @@ public:
 		int columna) const;
 
 	int limpiarFilas();
+	
+	bool filaCompleta(int fila) const;
+	void eliminarFila(int fila);
+	void insertarFilaVaciaInicio();
 
 	void dibujar(
 		int xInicial,

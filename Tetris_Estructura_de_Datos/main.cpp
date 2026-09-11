@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 	Tablero tablero;
 
 	// Crear primera pieza
-	Pieza piezaActual = crearPieza(T);
+	Pieza piezaActual = crearPieza(O);
 
 	//--------------------------------------------------
 	// Ciclo principal
@@ -35,8 +35,7 @@ int main(int argc, char *argv[])
 
 		if (IsKeyPressed(KEY_LEFT))
 		{
-			moverPieza(
-				piezaActual,
+			moverPieza(piezaActual,
 				-1,
 				0,
 				tablero);
