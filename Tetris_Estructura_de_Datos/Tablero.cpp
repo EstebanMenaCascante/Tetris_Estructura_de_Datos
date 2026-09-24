@@ -17,7 +17,6 @@ Tablero::Tablero()
 
 	NodoFila *ultimo = nullptr;
 
-	// Crear exactamente 20 filas
 	for (int fila = 0; fila < FILAS; fila++)
 	{
 		NodoFila *nuevaFila = new NodoFila();
@@ -35,9 +34,6 @@ Tablero::Tablero()
 	}
 }
 
-//------------------------------------------------------
-// Destructor
-//------------------------------------------------------
 Tablero::~Tablero()
 {
 	NodoFila *actual = primero;
@@ -54,9 +50,6 @@ Tablero::~Tablero()
 	primero = nullptr;
 }
 
-//------------------------------------------------------
-// Obtener una fila especifica
-//------------------------------------------------------
 Tablero::NodoFila *Tablero::obtenerFila(int numeroFila) const
 {
 	if (numeroFila < 0 || numeroFila >= FILAS)
@@ -77,9 +70,6 @@ Tablero::NodoFila *Tablero::obtenerFila(int numeroFila) const
 	return actual;
 }
 
-//------------------------------------------------------
-// Vaciar el tablero
-//------------------------------------------------------
 void Tablero::reiniciar()
 {
 	NodoFila *actual = primero;
@@ -95,9 +85,6 @@ void Tablero::reiniciar()
 	}
 }
 
-//------------------------------------------------------
-// Colocar un valor en una celda
-//------------------------------------------------------
 void Tablero::colocarCelda(int fila, int columna, int valor)
 {
 	if (columna < 0 || columna >= COLUMNAS)
@@ -113,9 +100,6 @@ void Tablero::colocarCelda(int fila, int columna, int valor)
 	}
 }
 
-//------------------------------------------------------
-// Consultar una celda
-//------------------------------------------------------
 int Tablero::obtenerCelda(int fila, int columna) const
 {
 	if (columna < 0 || columna >= COLUMNAS)
@@ -160,7 +144,6 @@ void Tablero::eliminarFila(int fila)
 		return;
 	}
 
-	// Si queremos eliminar la primera fila
 	if (fila == 0)
 	{
 		NodoFila *eliminar = primero;
@@ -174,7 +157,6 @@ void Tablero::eliminarFila(int fila)
 
 	NodoFila *anterior = primero;
 
-	// Llegamos al nodo anterior al que queremos eliminar
 	for (int i = 0; i < fila - 1; i++)
 	{
 		anterior = anterior->siguiente;
@@ -211,9 +193,6 @@ int Tablero::limpiarFilas()
 			insertarFilaVaciaInicio();
 
 			eliminadas++;
-
-			// No bajamos de fila todav�a.
-			// La fila superior acaba de caer a esta posici�n.
 		}
 		else
 		{
@@ -224,9 +203,6 @@ int Tablero::limpiarFilas()
 	return eliminadas;
 }
 
-//------------------------------------------------------
-// Dibujar el tablero usando raylib
-//------------------------------------------------------
 void Tablero::dibujar(int xInicial, int yInicial, int tamCelda) const
 {
 	NodoFila *actual = primero;
@@ -242,19 +218,10 @@ void Tablero::dibujar(int xInicial, int yInicial, int tamCelda) const
 
 			int valor = actual->celdas[columna];
 
-			//--------------------------------------------------
-			// Celda vacia
-			//--------------------------------------------------
-
 			if (valor == 0)
 			{
 				DrawRectangle(x + 1, y + 1, tamCelda - 2, tamCelda - 2, Color{30, 32, 40, 255});
 			}
-
-			//--------------------------------------------------
-			// Celda ocupada
-			//--------------------------------------------------
-
 			else
 			{
 				Color colorBloque = WHITE;
@@ -293,10 +260,6 @@ void Tablero::dibujar(int xInicial, int yInicial, int tamCelda) const
 				DrawRectangle(x + 2, y + 2, tamCelda - 4, tamCelda - 4, colorBloque);
 			}
 
-			//--------------------------------------------------
-			// Linea de la cuadricula
-			//--------------------------------------------------
-
 			DrawRectangleLines(x, y, tamCelda, tamCelda, Color{65, 68, 78, 255});
 		}
 
@@ -304,10 +267,6 @@ void Tablero::dibujar(int xInicial, int yInicial, int tamCelda) const
 
 		fila++;
 	}
-
-	//------------------------------------------------------
-	// Borde exterior
-	//------------------------------------------------------
 
 	Rectangle borde = {(float)xInicial, (float)yInicial, (float)(COLUMNAS * tamCelda), (float)(FILAS * tamCelda)};
 

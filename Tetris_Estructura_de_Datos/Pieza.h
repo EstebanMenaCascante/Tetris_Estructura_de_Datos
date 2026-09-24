@@ -24,24 +24,17 @@ struct Pieza
 	int rotacion;
 };
 
-// Crear una pieza
 Pieza crearPieza(TipoPieza tipo);
 
-// Obtener posicion de cada bloque
 int obtenerXBloque(const Pieza &pieza, int bloque);
 
 int obtenerYBloque(const Pieza &pieza, int bloque);
 
-// Dibujar pieza
 void dibujarPieza(
 	const Pieza &pieza,
 	int xTablero,
 	int yTablero,
 	int tamCelda);
-
-// --------------------------------------------------
-// Movimiento y colisiones
-// --------------------------------------------------
 
 bool posicionValida(
 	const Pieza &pieza,
@@ -56,4 +49,5 @@ bool moverPieza(
 bool rotarPieza(
 	Pieza &pieza,
 	const Tablero &tablero);
+
 #endif

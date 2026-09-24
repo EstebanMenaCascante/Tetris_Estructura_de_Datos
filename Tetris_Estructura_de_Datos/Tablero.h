@@ -16,16 +16,14 @@ private:
 
 	static const int FILAS = 20;
 	static const int COLUMNAS = 10;
-
-	NodoFila *obtenerFila(int numeroFila) const;
-
 	
-
 public:
 	Tablero();
 	~Tablero();
 
 	void reiniciar();
+	
+	NodoFila *obtenerFila(int numeroFila) const;
 
 	void colocarCelda(
 		int fila,
