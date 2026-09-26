@@ -5,7 +5,7 @@
 
 struct NodoCola
 {
-	TipoPieza tipo;
+	char tipo;
 	NodoCola *siguiente;
 };
 
@@ -22,9 +22,9 @@ public:
 	ColaPiezas();
 	~ColaPiezas();
 
-	void encolar(TipoPieza tipo);
-	TipoPieza desencolar();
-	TipoPieza verSiguiente(int indice) const;
+	void encolar(char tipo);
+	char desencolar();
+	char verSiguiente(int indice) const;
 	void rellenarSiEsNecesario();
 };
 

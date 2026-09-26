@@ -15,29 +15,29 @@ bool PilaHold::estaVacia() const {
 	return elemento == nullptr;
 }
 
-TipoPieza PilaHold::verPieza() const {
+char PilaHold::verPieza() const {
 	if (elemento != nullptr) {
 		return *elemento;
 	}
-	return I;
+	return 'I';
 }
 
-void PilaHold::apilar(TipoPieza tipo) {
+void PilaHold::apilar(char tipo) {
 	if (elemento == nullptr) {
-		elemento = new TipoPieza(tipo);
+		elemento = new char(tipo);
 	} else {
 		*elemento = tipo;
 	}
 }
 
-TipoPieza PilaHold::desapilar() {
+char PilaHold::desapilar() {
 	if (elemento != nullptr) {
-		TipoPieza tipo = *elemento;
+		char tipo = *elemento;
 		delete elemento;
 		elemento = nullptr;
 		return tipo;
 	}
-	return I;
+	return 'I';
 }
 
 bool PilaHold::puedeIntercambiar() const {

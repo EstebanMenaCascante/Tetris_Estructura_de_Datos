@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 					{
 						int col = obtenerXBloque(piezaActual, bloque);
 						int fila = obtenerYBloque(piezaActual, bloque);
-						tablero.colocarCelda(fila, col, (int)piezaActual.tipo + 1);
+						tablero.colocarCelda(fila, col, obtenerIndice(piezaActual.tipo) + 1); // Guardar numero en tablero
 					}
 					tablero.limpiarFilas();
 					piezaActual = crearPieza(cola.desencolar());
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 				}
 				else
 				{
-					TipoPieza guardada = hold.desapilar();
+					char guardada = hold.desapilar(); // Obtenemos la letra guardada
 					hold.apilar(piezaActual.tipo);
 					piezaActual = crearPieza(guardada);
 				}
@@ -139,14 +139,8 @@ int main(int argc, char *argv[])
 			dibujarPieza(piezaActual, 320, 60, 28);
 
 			DrawText("TABLERO", 650, 100, 28, RAYWHITE);
-
-			DrawText("10 columnas", 650, 150, 20, LIGHTGRAY);
-
-			DrawText("20 filas", 650, 180, 20, LIGHTGRAY);
-
-			DrawText("Lista enlazada", 650, 230, 20, GREEN);
-
-			DrawText("HOLD (Tecla C)", 50, 200, 20, RAYWHITE);
+			
+			DrawText("Cambio (Tecla C)", 50, 200, 20, RAYWHITE);
 
 			if (!hold.estaVacia())
 			{

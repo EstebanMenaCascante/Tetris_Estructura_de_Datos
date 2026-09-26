@@ -25,14 +25,9 @@ public:
 	
 	NodoFila *obtenerFila(int numeroFila) const;
 
-	void colocarCelda(
-		int fila,
-		int columna,
-		int valor);
+	void colocarCelda(int fila, int columna, int valor);
 
-	int obtenerCelda(
-		int fila,
-		int columna) const;
+	int obtenerCelda(int fila,int columna) const;
 
 	int limpiarFilas();
 	
@@ -40,10 +35,7 @@ public:
 	void eliminarFila(int fila);
 	void insertarFilaVaciaInicio();
 
-	void dibujar(
-		int xInicial,
-		int yInicial,
-		int tamCelda) const;
+	void dibujar(int xInicial, int yInicial, int tamCelda) const;
 };
 
 #endif

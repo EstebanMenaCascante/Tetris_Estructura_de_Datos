@@ -5,7 +5,7 @@
 
 class PilaHold {
 private:
-	TipoPieza* elemento;
+	char* elemento;
 	bool bloqueado;
 	
 public:
@@ -13,9 +13,9 @@ public:
 	~PilaHold();
 	
 	bool estaVacia() const;
-	TipoPieza verPieza() const;
-	void apilar(TipoPieza tipo);
-	TipoPieza desapilar();
+	char verPieza() const;
+	void apilar(char tipo);
+	char desapilar();
 	
 	bool puedeIntercambiar() const;
 	void bloquear();
