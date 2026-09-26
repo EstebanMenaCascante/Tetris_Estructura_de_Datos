@@ -3,6 +3,7 @@
 #include "Pieza.h"
 #include "ColaPiezas.h"
 #include "PilaHold.h"
+#include "ListaReplay.h"
 #include "raylib.h"
 #include <cmath>
 using namespace std;
@@ -23,12 +24,18 @@ int main(int argc, char *argv[])
 
 	Pieza piezaActual = crearPieza(cola.desencolar());
 	cola.rellenarSiEsNecesario();
+	
+	ListaReplay historial;
+	historial.registrarEstado(piezaActual, tablero, hold);	
 
 	float tiempoCaida = 0.0f;
 	float velocidadCaida = 0.5f;
 
 	float tiempoMovLateral = 0.0f;
 	float retardoMovimiento = 0.12f;
+	
+	float tiempoReplay = 0.0f;
+	float retardoReplay = 0.08f;
 
 	bool gameOver = false;
 
@@ -38,6 +45,8 @@ int main(int argc, char *argv[])
 		float deltaTime = GetFrameTime();
 		if (!gameOver)
 		{
+			bool hizoMovimiento = false;
+			
 			tiempoCaida += deltaTime;
 			if (tiempoCaida >= velocidadCaida)
 			{
@@ -59,13 +68,20 @@ int main(int argc, char *argv[])
 						gameOver = true;
 					}
 					hold.desbloquear();
+					hizoMovimiento = true;
+				}
+				else{
+					hizoMovimiento = true;
 				}
 			}
+			
+			
 
 			if (IsKeyPressed(KEY_LEFT))
 			{
 				moverPieza(piezaActual, -1, 0, tablero);
 				tiempoMovLateral = 0.0f;
+				hizoMovimiento = true;
 			}
 			else if (IsKeyDown(KEY_LEFT))
 			{
@@ -74,12 +90,14 @@ int main(int argc, char *argv[])
 				{
 					moverPieza(piezaActual, -1, 0, tablero);
 					tiempoMovLateral = 0.0f;
+					hizoMovimiento = true;
 				}
 			}
 			if (IsKeyPressed(KEY_RIGHT))
 			{
 				moverPieza(piezaActual, 1, 0, tablero);
 				tiempoMovLateral = 0.0f;
+				hizoMovimiento = true;
 			}
 			else if (IsKeyDown(KEY_RIGHT))
 			{
@@ -88,11 +106,13 @@ int main(int argc, char *argv[])
 				{
 					moverPieza(piezaActual, 1, 0, tablero);
 					tiempoMovLateral = 0.0f;
+					hizoMovimiento = true;
 				}
 			}
 			if (IsKeyDown(KEY_DOWN))
 			{
 				velocidadCaida = 0.05f;
+				hizoMovimiento = true;
 			}
 			else
 			{
@@ -101,9 +121,8 @@ int main(int argc, char *argv[])
 
 			if (IsKeyPressed(KEY_UP))
 			{
-				rotarPieza(
-					piezaActual,
-					tablero);
+				rotarPieza(piezaActual, tablero);
+				hizoMovimiento = true;
 			}
 
 			if (IsKeyPressed(KEY_C) && hold.puedeIntercambiar())
@@ -116,11 +135,69 @@ int main(int argc, char *argv[])
 				}
 				else
 				{
-					char guardada = hold.desapilar(); // Obtenemos la letra guardada
+					char guardada = hold.desapilar(); // Para saber la pieza guardada
 					hold.apilar(piezaActual.tipo);
 					piezaActual = crearPieza(guardada);
 				}
 				hold.bloquear();
+			}
+			bool intentarDeshacer = false;
+			bool intentarRehacer = false;
+			
+			if (IsKeyPressed(KEY_Z)) {
+				intentarDeshacer = true;
+				tiempoReplay = 0.0f;
+			} else if (IsKeyDown(KEY_Z)) {
+				tiempoReplay += deltaTime;
+				if (tiempoReplay >= retardoReplay) {
+					intentarDeshacer = true;
+					tiempoReplay = 0.0f;
+				}
+			}
+			
+			if (IsKeyPressed(KEY_X)) {
+				intentarRehacer = true;
+				tiempoReplay = 0.0f;
+			} else if (IsKeyDown(KEY_X)) {
+				tiempoReplay += deltaTime;
+				if (tiempoReplay >= retardoReplay) {
+					intentarRehacer = true;
+					tiempoReplay = 0.0f;
+				}
+			}
+			
+			if (intentarDeshacer && historial.puedeDeshacer()) {
+				EstadoJuego deshacer = historial.deshacer();
+				
+				piezaActual = deshacer.piezaActual;
+				for (int fila = 0; fila < 20; fila++) {
+					for (int col = 0; col < 10; col++) {
+						tablero.colocarCelda(fila, col, deshacer.tableroRepleay[fila][col]);
+					}
+				}
+				if (!hold.estaVacia()) hold.desapilar();
+				if (!deshacer.holdVacio) hold.apilar(deshacer.piezaHold);
+				if (deshacer.holdBloqueado) hold.bloquear(); else hold.desbloquear();
+				
+				tiempoCaida = 0.0f;
+			}
+			if (intentarRehacer && historial.puedeRehacer()) {
+				EstadoJuego rehacer = historial.rehacer();
+				
+				piezaActual = rehacer.piezaActual;
+				for (int fila = 0; fila < 20; fila++) {
+					for (int col = 0; col < 10; col++) {
+						tablero.colocarCelda(fila, col, rehacer.tableroRepleay[fila][col]);
+					}
+				}
+				if (!hold.estaVacia()) hold.desapilar();
+				if (!rehacer.holdVacio) hold.apilar(rehacer.piezaHold);
+				if (rehacer.holdBloqueado) hold.bloquear(); else hold.desbloquear();
+				
+				tiempoCaida = 0.0f;
+			}
+			if (hizoMovimiento) {
+				historial.registrarEstado(piezaActual, tablero, hold);
 			}
 		}
 
