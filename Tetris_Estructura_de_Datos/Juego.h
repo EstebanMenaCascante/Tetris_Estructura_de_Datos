@@ -6,8 +6,10 @@
 #include "PilaHold.h"
 #include "ListaReplay.h"
 #include "Jugador.h"
+#include "Archivo.h"
 #include "raylib.h"
 #include <string>
+#include <vector>
 
 class Juego {
 private:
@@ -17,9 +19,11 @@ private:
     ListaReplay historial;
     Pieza piezaActual;
     Jugador jugadorActual;
+    
+    Archivo gestorArchivos;
+    int metodoOrdenamiento; // 0 = Insertion Sort, 1 = Merge Sort
+    std::vector<RegistroPuntaje> top10; // Para mostrar en la pantalla
 
-	const int PUNTAJE_BASE = 50;
-	
     int pantalla; 
     float tiempoCaida;
     float velocidadCaida;
@@ -33,29 +37,29 @@ private:
     float velocidadPelicula;
     bool peliculaPausada;
 
-    std::string nombreTemp; //almacena temporalmente el nombre del jugador mientras lo escribe
-    int framesCursor;
+    std::string nombreTemp; // Para guardar lo que el jugador teclea
+    int framesCursor; // Para hacer parpadear el cursor
 
-    
+    void cargarFotogramaPelicula();
+
+    void actualizarInicio();
+    void actualizarEscribirNombre(); 
+    void actualizarJugando(float deltaTime);
+    void actualizarPausa();
+    void actualizarGameOver();
+    void actualizarPelicula(float deltaTime);
+    void actualizarEstadisticas();
+
+    void dibujarInicio();
+    void dibujarEscribirNombre(); 
+    void dibujarJugando();
+    void dibujarPausa();
+    void dibujarGameOver();
+    void dibujarPelicula();
+    void dibujarEstadisticas();
 
 public:
     Juego();
-	void cargarFotogramaPelicula();
-	
-	void actualizarInicio();
-	void actualizarEscribirNombre();
-	void actualizarJugando(float deltaTime);
-	void actualizarPausa();
-	void actualizarGameOver();
-	void actualizarPelicula(float deltaTime);
-	
-	void dibujarInicio();
-	void dibujarEscribirNombre(); 
-	void dibujarJugando();
-	void dibujarPausa();
-	void dibujarGameOver();
-	void dibujarPelicula();
-	
     void actualizar(float deltaTime);
     void dibujar();
 };

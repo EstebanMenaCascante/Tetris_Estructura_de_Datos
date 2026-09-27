@@ -18,6 +18,8 @@ Juego::Juego()
 	nombreTemp = "";
 	framesCursor = 0;
 
+	metodoOrdenamiento = 0; // Insertion Sort por defecto
+
 	piezaActual = crearPieza(cola.desencolar());
 	cola.rellenarSiEsNecesario();
 	historial.registrarEstado(piezaActual, tablero, hold);
@@ -36,7 +38,9 @@ void Juego::actualizar(float deltaTime)
 	else if (pantalla == 4)
 		actualizarPelicula(deltaTime);
 	else if (pantalla == 5)
-		actualizarEscribirNombre(); // Dibujo de caja de texto
+		actualizarEscribirNombre();
+	else if (pantalla == 6)
+		actualizarEstadisticas();
 }
 
 void Juego::dibujar()
@@ -52,7 +56,9 @@ void Juego::dibujar()
 	else if (pantalla == 4)
 		dibujarPelicula();
 	else if (pantalla == 5)
-		dibujarEscribirNombre(); // Dibujo de caja de texto
+		dibujarEscribirNombre();
+	else if (pantalla == 6)
+		dibujarEstadisticas();
 }
 
 void Juego::actualizarInicio()
@@ -76,7 +82,8 @@ void Juego::actualizarInicio()
 		}
 		else if (CheckCollisionPointRec(raton, btnStats))
 		{
-			// falta pantalla de estadisticas
+			pantalla = 6;
+			top10 = gestorArchivos.cargarPuntajes();
 		}
 	}
 }
@@ -87,7 +94,6 @@ void Juego::actualizarEscribirNombre()
 
 	while (tecla > 0)
 	{
-
 		if ((tecla >= 32) && (tecla <= 125) && (nombreTemp.length() < 15))
 		{
 			nombreTemp += (char)tecla;
@@ -99,7 +105,7 @@ void Juego::actualizarEscribirNombre()
 	{
 		if (nombreTemp.length() > 0)
 		{
-			nombreTemp.pop_back(); // Elimina la ultima letra
+			nombreTemp.pop_back();
 		}
 	}
 
@@ -117,7 +123,6 @@ void Juego::dibujarEscribirNombre()
 {
 	DrawText("INGRESA TU NOMBRE", 250, 200, 40, RAYWHITE);
 
-	// Dibujar la caja de texto
 	DrawRectangle(250, 280, 400, 60, LIGHTGRAY);
 	DrawText(nombreTemp.c_str(), 270, 295, 30, BLACK);
 
@@ -128,6 +133,59 @@ void Juego::dibujarEscribirNombre()
 	}
 
 	DrawText("Presiona ENTER para guardar", 270, 400, 20, GRAY);
+}
+
+void Juego::actualizarEstadisticas()
+{
+	Vector2 raton = GetMousePosition();
+	Rectangle btnVolver = {350, 600, 200, 50};
+	Rectangle btnMetodo = {300, 100, 300, 40};
+
+	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+	{
+		if (CheckCollisionPointRec(raton, btnVolver))
+		{
+			pantalla = 0;
+		}
+		else if (CheckCollisionPointRec(raton, btnMetodo))
+		{
+			// Cambiar de algoritmo
+			metodoOrdenamiento = (metodoOrdenamiento == 0) ? 1 : 0;
+
+			// Insertion Sort por defecto
+			if (metodoOrdenamiento == 0)
+			{
+				gestorArchivos.insertionSort(top10);
+			}
+			else
+			{
+				gestorArchivos.mergeSort(top10, 0, (int)top10.size() - 1);
+			}
+		}
+	}
+}
+
+void Juego::dibujarEstadisticas()
+{
+	DrawText("MEJORES PUNTAJES (TOP 10)", 250, 40, 30, GREEN);
+
+	// Boton para alternar el algoritmo de ordenamiento
+	Rectangle btnMetodo = {300, 100, 300, 40};
+	DrawRectangleRec(btnMetodo, DARKBLUE);
+	const char *textoMetodo = (metodoOrdenamiento == 0) ? "Orden: Insertion Sort (O(n^2))" : "Orden: Merge Sort (O(n log n))";
+	DrawText(textoMetodo, 315, 110, 18, RAYWHITE);
+
+	int y = 180;
+	for (int i = 0; i < top10.size(); i++)
+	{
+		DrawText(TextFormat("%d. %s", i + 1, top10[i].nombre.c_str()), 300, y, 25, RAYWHITE);
+		DrawText(TextFormat("%d", top10[i].puntaje), 550, y, 25, YELLOW);
+		y += 40;
+	}
+
+	Rectangle btnVolver = {350, 600, 200, 50};
+	DrawRectangleRec(btnVolver, RED);
+	DrawText("Volver", 415, 615, 20, WHITE);
 }
 
 void Juego::actualizarPausa()
@@ -173,11 +231,11 @@ void Juego::actualizarJugando(float deltaTime)
 				jugadorActual.sumarLineas(lineasBorradas);
 				jugadorActual.actualizarMaxCombo(lineasBorradas);
 
+				const int PUNTAJE_BASE = 50;
 				int puntos = 0;
 
 				if (lineasBorradas == 1)
 					puntos = PUNTAJE_BASE;
-
 				else if (lineasBorradas == 2)
 					puntos = (2 * PUNTAJE_BASE) + (PUNTAJE_BASE / 2);
 				else if (lineasBorradas == 3)
@@ -194,6 +252,8 @@ void Juego::actualizarJugando(float deltaTime)
 			if (!posicionValida(piezaActual, tablero))
 			{
 				pantalla = 3;
+				// Al perder guarda y ordena de un solo
+				gestorArchivos.guardarPuntaje(jugadorActual.getNombre(), jugadorActual.getPuntaje(), metodoOrdenamiento);
 			}
 			hold.desbloquear();
 			hizoMovimiento = true;
@@ -357,7 +417,7 @@ void Juego::actualizarJugando(float deltaTime)
 
 void Juego::dibujarInicio()
 {
-	DrawText("TETRIS UNA", 320, 150, 40, RAYWHITE);
+	DrawText("TETRIS UNA", 330, 150, 40, RAYWHITE);
 	DrawText(TextFormat("Jugador actual: %s", jugadorActual.getNombre().c_str()), 330, 220, 20, LIGHTGRAY);
 
 	Rectangle btnJugar = {350, 300, 200, 50};
@@ -368,24 +428,24 @@ void Juego::dibujarInicio()
 	DrawText("JUGAR", 415, 315, 20, BLACK);
 
 	DrawRectangleRec(btnJugador, BLUE);
-	DrawText("Agregar Jugador", 365, 395, 20, WHITE);
+	DrawText("Jugador", 410, 395, 20, WHITE);
 
 	DrawRectangleRec(btnStats, ORANGE);
-	DrawText("Estadisticas", 390, 475, 20, BLACK);
+	DrawText("Top Jugadores", 380, 475, 20, BLACK);
 }
 
 void Juego::dibujarJugando()
 {
-	DrawText("TETRIS", 50, 100, 50, RAYWHITE);
-	// DrawText("UNA", 60, 120, 30, GRAY);
+	DrawText("TETRIS", 50, 60, 50, RAYWHITE);
+	//DrawText("Estructuras de Datos", 30, 120, 24, GRAY);
+	
+	// Titulo centrado arriba del tablero
+	DrawText("TABLERO", 390, 20, 28, RAYWHITE);
+	
 	tablero.dibujar(320, 60, 28);
 	dibujarPieza(piezaActual, 320, 60, 28);
 
-	DrawText("TABLERO", 390, 30, 28, RAYWHITE);
 	DrawText("Cambio (Tecla C)", 50, 200, 20, RAYWHITE);
-	DrawText("Deshacer (Tecla Z)", 50, 320, 20, RAYWHITE);
-	DrawText("Rehacer (Tecla X)", 50, 380, 20, RAYWHITE);
-	DrawText("Pausa (Tecla P)", 50, 440, 20, RAYWHITE);
 
 	if (!hold.estaVacia())
 	{
@@ -394,23 +454,28 @@ void Juego::dibujarJugando()
 		pHold.y = 0;
 		dibujarPieza(pHold, 50, 240, 28);
 	}
+	
+	// Controles del juego restaurados
+	DrawText("Controles:", 50, 330, 22, RAYWHITE);
+	DrawText("[Z] Deshacer paso", 50, 360, 18, LIGHTGRAY);
+	DrawText("[X] Rehacer paso", 50, 390, 18, LIGHTGRAY);
+	DrawText("[P] Pausar juego", 50, 420, 18, LIGHTGRAY);
 
-	DrawText("SIGUIENTES", 650, 150, 20, RAYWHITE);
+	DrawText("SIGUIENTES", 650, 250, 20, RAYWHITE);
 	for (int i = 0; i < 3; i++)
 	{
 		Pieza pSiguiente = crearPieza(cola.verSiguiente(i));
 		pSiguiente.x = 0;
 		pSiguiente.y = 0;
-		dibujarPieza(pSiguiente, 650, 200 + (i * 90), 28);
+		dibujarPieza(pSiguiente, 650, 290 + (i * 90), 28);
 	}
 
-	// Mostrar Puntaje y Tiempo
 	DrawText(TextFormat("PUNTAJE: %i", jugadorActual.getPuntaje()), 650, 40, 25, GREEN);
 	if (jugadorActual.getUltimoPuntaje() > 0)
 	{
 		DrawText(TextFormat("+%i", jugadorActual.getUltimoPuntaje()), 650, 70, 20, YELLOW);
 	}
-	DrawText(TextFormat("Tiempo: %.0f seg", jugadorActual.getTiempoPartida()), 650, 100, 20, RAYWHITE);
+	DrawText(TextFormat("Tiempo: %.0f seg", jugadorActual.getTiempoPartida()), 650, 140, 20, RAYWHITE);
 }
 
 void Juego::dibujarPausa()
@@ -524,7 +589,7 @@ void Juego::actualizarPelicula(float deltaTime)
 
 void Juego::dibujarPelicula()
 {
-	DrawText("REPRODUCIENDO PARTIDA", 250, 20, 25, GREEN);
+	DrawText("REPRODUCIENDO PARTIDA...", 250, 20, 25, GREEN);
 
 	tablero.dibujar(320, 60, 28);
 	dibujarPieza(piezaActual, 320, 60, 28);
