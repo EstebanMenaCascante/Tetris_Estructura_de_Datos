@@ -5,47 +5,55 @@
 #include "ColaPiezas.h"
 #include "PilaHold.h"
 #include "ListaReplay.h"
+#include "Jugador.h"
 #include "raylib.h"
+#include <string>
 
-class Juego
-{
+class Juego {
 private:
-	Tablero tablero;
-	ColaPiezas cola;
-	PilaHold hold;
-	ListaReplay historial;
-	Pieza piezaActual;
+    Tablero tablero;
+    ColaPiezas cola;
+    PilaHold hold;
+    ListaReplay historial;
+    Pieza piezaActual;
+    Jugador jugadorActual;
 
-	int pantalla;
-	float tiempoCaida;
-	float velocidadCaida;
-	float tiempoMovLateral;
-	float retardoMovimiento;
-	float tiempoReplay;
-	float retardoReplay;
+    int pantalla; 
+    float tiempoCaida;
+    float velocidadCaida;
+    float tiempoMovLateral;
+    float retardoMovimiento;
+    float tiempoReplay;
+    float retardoReplay;
 
-	NodoReplay *nodoPelicula;
-	float tiempoPelicula;
-	float velocidadPelicula;
-	bool peliculaPausada;
+    NodoReplay *nodoPelicula;
+    float tiempoPelicula;
+    float velocidadPelicula;
+    bool peliculaPausada;
 
-	void cargarFotogramaPelicula();
+    std::string nombreTemp; //almacena temporalmente el nombre del jugador mientras lo escribe
+    int framesCursor;
 
-	void actualizarInicio();
-	void actualizarJugando(float deltaTime);
-	void actualizarPausa();
-	void actualizarGameOver();
-	void actualizarPelicula(float deltaTime);
+    void cargarFotogramaPelicula();
 
-	void dibujarInicio();
-	void dibujarJugando();
-	void dibujarGameOver();
-	void dibujarPelicula();
+    void actualizarInicio();
+    void actualizarEscribirNombre();
+    void actualizarJugando(float deltaTime);
+    void actualizarPausa();
+    void actualizarGameOver();
+    void actualizarPelicula(float deltaTime);
+
+    void dibujarInicio();
+    void dibujarEscribirNombre(); 
+    void dibujarJugando();
+    void dibujarPausa();
+    void dibujarGameOver();
+    void dibujarPelicula();
 
 public:
-	Juego();
-	void actualizar(float deltaTime);
-	void dibujar();
+    Juego();
+    void actualizar(float deltaTime);
+    void dibujar();
 };
 
 #endif

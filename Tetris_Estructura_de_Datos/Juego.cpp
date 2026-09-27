@@ -1,4 +1,5 @@
 #include "Juego.h"
+#include <string>
 
 Juego::Juego()
 {
@@ -14,6 +15,8 @@ Juego::Juego()
 	peliculaPausada = false;
 	nodoPelicula = nullptr;
 	tiempoPelicula = 0.0f;
+	nombreTemp = "";
+	framesCursor = 0;
 
 	piezaActual = crearPieza(cola.desencolar());
 	cola.rellenarSiEsNecesario();
@@ -32,24 +35,99 @@ void Juego::actualizar(float deltaTime)
 		actualizarGameOver();
 	else if (pantalla == 4)
 		actualizarPelicula(deltaTime);
+	else if (pantalla == 5)
+		actualizarEscribirNombre(); // Dibujo de caja de texto
 }
 
 void Juego::dibujar()
 {
 	if (pantalla == 0)
 		dibujarInicio();
-	else if (pantalla == 1 || pantalla == 2)
+	else if (pantalla == 1)
 		dibujarJugando();
+	else if (pantalla == 2)
+		dibujarPausa();
 	else if (pantalla == 3)
 		dibujarGameOver();
 	else if (pantalla == 4)
 		dibujarPelicula();
+	else if (pantalla == 5)
+		dibujarEscribirNombre(); // Dibujo de caja de texto
 }
 
 void Juego::actualizarInicio()
 {
+	Vector2 raton = GetMousePosition();
+	Rectangle btnJugar = {350, 300, 200, 50};
+	Rectangle btnJugador = {350, 380, 200, 50};
+	Rectangle btnStats = {350, 460, 200, 50};
+
+	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+	{
+		if (CheckCollisionPointRec(raton, btnJugar))
+		{
+			jugadorActual.reiniciarEstadisticas();
+			pantalla = 1;
+		}
+		else if (CheckCollisionPointRec(raton, btnJugador))
+		{
+			nombreTemp = "";
+			pantalla = 5;
+		}
+		else if (CheckCollisionPointRec(raton, btnStats))
+		{
+			// falta pantalla de estadisticas
+		}
+	}
+}
+
+void Juego::actualizarEscribirNombre()
+{
+	int tecla = GetCharPressed();
+
+	while (tecla > 0)
+	{
+
+		if ((tecla >= 32) && (tecla <= 125) && (nombreTemp.length() < 15))
+		{
+			nombreTemp += (char)tecla;
+		}
+		tecla = GetCharPressed();
+	}
+
+	if (IsKeyPressed(KEY_BACKSPACE))
+	{
+		if (nombreTemp.length() > 0)
+		{
+			nombreTemp.pop_back(); // Elimina la ultima letra
+		}
+	}
+
 	if (IsKeyPressed(KEY_ENTER))
-		pantalla = 1;
+	{
+		if (nombreTemp.length() > 0)
+		{
+			jugadorActual.setNombre(nombreTemp);
+		}
+		pantalla = 0;
+	}
+}
+
+void Juego::dibujarEscribirNombre()
+{
+	DrawText("INGRESA TU NOMBRE", 250, 200, 40, RAYWHITE);
+
+	// Dibujar la caja de texto
+	DrawRectangle(250, 280, 400, 60, LIGHTGRAY);
+	DrawText(nombreTemp.c_str(), 270, 295, 30, BLACK);
+
+	framesCursor++;
+	if (((framesCursor / 30) % 2) == 0 && nombreTemp.length() < 15)
+	{
+		DrawText("_", 270 + MeasureText(nombreTemp.c_str(), 30), 295, 30, BLACK);
+	}
+
+	DrawText("Presiona ENTER para guardar", 270, 400, 20, GRAY);
 }
 
 void Juego::actualizarPausa()
@@ -73,6 +151,7 @@ void Juego::actualizarGameOver()
 
 void Juego::actualizarJugando(float deltaTime)
 {
+	jugadorActual.sumarTiempo(deltaTime);
 	bool hizoMovimiento = false;
 
 	tiempoCaida += deltaTime;
@@ -87,7 +166,29 @@ void Juego::actualizarJugando(float deltaTime)
 				int fila = obtenerYBloque(piezaActual, bloque);
 				tablero.colocarCelda(fila, col, obtenerIndice(piezaActual.tipo) + 1);
 			}
-			tablero.limpiarFilas();
+
+			int lineasBorradas = tablero.limpiarFilas();
+			if (lineasBorradas > 0)
+			{
+				jugadorActual.sumarLineas(lineasBorradas);
+				jugadorActual.actualizarMaxCombo(lineasBorradas);
+
+				const int PUNTAJE_BASE = 50;
+				int puntos = 0;
+
+				if (lineasBorradas == 1)
+					puntos = PUNTAJE_BASE;
+
+				else if (lineasBorradas == 2)
+					puntos = (2 * PUNTAJE_BASE) + (PUNTAJE_BASE / 2);
+				else if (lineasBorradas == 3)
+					puntos = (3 * PUNTAJE_BASE) + PUNTAJE_BASE;
+				else if (lineasBorradas >= 4)
+					puntos = (lineasBorradas * PUNTAJE_BASE) * 2;
+
+				jugadorActual.sumarPuntaje(puntos);
+			}
+
 			piezaActual = crearPieza(cola.desencolar());
 			cola.rellenarSiEsNecesario();
 
@@ -120,7 +221,6 @@ void Juego::actualizarJugando(float deltaTime)
 			hizoMovimiento = true;
 		}
 	}
-
 	if (IsKeyPressed(KEY_RIGHT))
 	{
 		moverPieza(piezaActual, 1, 0, tablero);
@@ -137,7 +237,6 @@ void Juego::actualizarJugando(float deltaTime)
 			hizoMovimiento = true;
 		}
 	}
-
 	if (IsKeyDown(KEY_DOWN))
 	{
 		velocidadCaida = 0.05f;
@@ -147,13 +246,11 @@ void Juego::actualizarJugando(float deltaTime)
 	{
 		velocidadCaida = 0.5f;
 	}
-
 	if (IsKeyPressed(KEY_UP))
 	{
 		rotarPieza(piezaActual, tablero);
 		hizoMovimiento = true;
 	}
-
 	if (IsKeyPressed(KEY_C) && hold.puedeIntercambiar())
 	{
 		if (hold.estaVacia())
@@ -189,7 +286,6 @@ void Juego::actualizarJugando(float deltaTime)
 			tiempoReplay = 0.0f;
 		}
 	}
-
 	if (IsKeyPressed(KEY_X))
 	{
 		intentarRehacer = true;
@@ -224,7 +320,6 @@ void Juego::actualizarJugando(float deltaTime)
 			hold.bloquear();
 		else
 			hold.desbloquear();
-
 		tiempoCaida = 0.0f;
 	}
 
@@ -247,7 +342,6 @@ void Juego::actualizarJugando(float deltaTime)
 			hold.bloquear();
 		else
 			hold.desbloquear();
-
 		tiempoCaida = 0.0f;
 	}
 
@@ -264,8 +358,21 @@ void Juego::actualizarJugando(float deltaTime)
 
 void Juego::dibujarInicio()
 {
-	DrawText("TETRIS ESTUDIANTIL", 250, 300, 40, RAYWHITE);
-	DrawText("Presiona ENTER para iniciar", 280, 400, 20, GRAY);
+	DrawText("TETRIS UNA", 250, 150, 40, RAYWHITE);
+	DrawText(TextFormat("Jugador actual: %s", jugadorActual.getNombre().c_str()), 330, 220, 20, LIGHTGRAY);
+
+	Rectangle btnJugar = {350, 300, 200, 50};
+	Rectangle btnJugador = {350, 380, 200, 50};
+	Rectangle btnStats = {350, 460, 200, 50};
+
+	DrawRectangleRec(btnJugar, GREEN);
+	DrawText("JUGAR", 415, 315, 20, BLACK);
+
+	DrawRectangleRec(btnJugador, BLUE);
+	DrawText("Agregar Jugador", 365, 395, 20, WHITE);
+
+	DrawRectangleRec(btnStats, ORANGE);
+	DrawText("Estadisticas", 390, 475, 20, BLACK);
 }
 
 void Juego::dibujarJugando()
@@ -277,6 +384,9 @@ void Juego::dibujarJugando()
 
 	DrawText("TABLERO", 650, 100, 28, RAYWHITE);
 	DrawText("Cambio (Tecla C)", 50, 200, 20, RAYWHITE);
+	DrawText("Deshacer (Tecla Z)", 50, 320, 20, RAYWHITE);
+	DrawText("Rehacer (Tecla X)", 50, 380, 20, RAYWHITE);
+	DrawText("Pausa (Tecla P)", 50, 440, 20, RAYWHITE);
 
 	if (!hold.estaVacia())
 	{
@@ -295,16 +405,39 @@ void Juego::dibujarJugando()
 		dibujarPieza(pSiguiente, 650, 340 + (i * 90), 28);
 	}
 
-	if (pantalla == 2)
+	// Mostrar Puntaje y Tiempo
+	DrawText(TextFormat("PUNTAJE: %i", jugadorActual.getPuntaje()), 650, 40, 25, GREEN);
+	if (jugadorActual.getUltimoPuntaje() > 0)
 	{
-		DrawText("PAUSA", 400, 300, 40, YELLOW);
+		DrawText(TextFormat("+%i", jugadorActual.getUltimoPuntaje()), 650, 70, 20, YELLOW);
 	}
+	DrawText(TextFormat("Tiempo: %.0f seg", jugadorActual.getTiempoPartida()), 650, 140, 20, RAYWHITE);
+}
+
+void Juego::dibujarPausa()
+{
+	dibujarJugando();
+	DrawRectangle(0, 0, 900, 700, Color{0, 0, 0, 200});
+
+	DrawText("PAUSA", 370, 200, 50, YELLOW);
+	DrawText(TextFormat("Jugador: %s", jugadorActual.getNombre().c_str()), 350, 300, 25, RAYWHITE);
+	DrawText(TextFormat("Puntaje Actual: %i", jugadorActual.getPuntaje()), 350, 350, 25, GREEN);
+	DrawText(TextFormat("Tiempo: %.0f seg", jugadorActual.getTiempoPartida()), 350, 400, 25, RAYWHITE);
+
+	DrawText("Presiona [P] para continuar", 300, 500, 20, GRAY);
 }
 
 void Juego::dibujarGameOver()
 {
-	DrawText("GAME OVER", 300, 250, 50, RED);
-	DrawText("Presiona [R] para ver la Repeticion", 260, 350, 20, RAYWHITE);
+	DrawText("GAME OVER", 330, 120, 50, RED);
+
+	DrawText(TextFormat("Jugador: %s", jugadorActual.getNombre().c_str()), 300, 230, 25, RAYWHITE);
+	DrawText(TextFormat("Puntaje Total: %i", jugadorActual.getPuntaje()), 300, 280, 25, GREEN);
+	DrawText(TextFormat("Tiempo de Juego: %.0f seg", jugadorActual.getTiempoPartida()), 300, 330, 25, RAYWHITE);
+	DrawText(TextFormat("Lineas Totales: %i", jugadorActual.getLineasTotales()), 300, 380, 25, RAYWHITE);
+	DrawText(TextFormat("Mejor Combo: %i lineas", jugadorActual.getMaxLineasCombo()), 300, 430, 25, YELLOW);
+
+	DrawText("Presiona [R] para ver el Replay", 250, 550, 25, LIGHTGRAY);
 }
 
 void Juego::cargarFotogramaPelicula()
@@ -363,23 +496,18 @@ void Juego::actualizarPelicula(float deltaTime)
 	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
 	{
 		if (CheckCollisionPointRec(raton, btnPausa))
-		{
 			peliculaPausada = !peliculaPausada;
-		}
 		else if (CheckCollisionPointRec(raton, btnVelocidad))
 		{
 			if (velocidadPelicula == 0.15f)
-				velocidadPelicula = 0.05f; // Modo x3
+				velocidadPelicula = 0.05f;
 			else
-				velocidadPelicula = 0.15f; // Modo Normal
+				velocidadPelicula = 0.15f;
 		}
 		else if (CheckCollisionPointRec(raton, btnSalir))
-		{
 			pantalla = 3;
-		}
 	}
 
-	// Reproduccion automatica
 	if (!peliculaPausada)
 	{
 		tiempoPelicula += deltaTime;
@@ -397,20 +525,17 @@ void Juego::actualizarPelicula(float deltaTime)
 
 void Juego::dibujarPelicula()
 {
-	DrawText("REPRODUCIENDO JUEGO", 250, 20, 25, GREEN);
+	DrawText("REPRODUCIENDO PARTIDA", 250, 20, 25, GREEN);
 
-	// Dibujar el tablero y la pieza actual
 	tablero.dibujar(320, 60, 28);
 	dibujarPieza(piezaActual, 320, 60, 28);
 
-	// Dibujar los botones de control
 	Rectangle btnAtras = {85, 620, 130, 40};
 	Rectangle btnPausa = {235, 620, 130, 40};
 	Rectangle btnAdelante = {385, 620, 130, 40};
 	Rectangle btnVelocidad = {535, 620, 130, 40};
 	Rectangle btnSalir = {685, 620, 130, 40};
 
-	// Dibujar los botones con colores y texto
 	DrawRectangleRec(btnAtras, DARKGRAY);
 	DrawText("<<< Atras", 100, 630, 20, WHITE);
 
