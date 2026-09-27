@@ -173,7 +173,6 @@ void Juego::actualizarJugando(float deltaTime)
 				jugadorActual.sumarLineas(lineasBorradas);
 				jugadorActual.actualizarMaxCombo(lineasBorradas);
 
-				const int PUNTAJE_BASE = 50;
 				int puntos = 0;
 
 				if (lineasBorradas == 1)
@@ -378,7 +377,7 @@ void Juego::dibujarInicio()
 void Juego::dibujarJugando()
 {
 	DrawText("TETRIS", 50, 100, 50, RAYWHITE);
-	//DrawText("UNA", 60, 120, 30, GRAY);
+	// DrawText("UNA", 60, 120, 30, GRAY);
 	tablero.dibujar(320, 60, 28);
 	dibujarPieza(piezaActual, 320, 60, 28);
 

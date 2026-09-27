@@ -13,11 +13,12 @@ public:
 	~PilaHold();
 	
 	bool estaVacia() const;
-	char verPieza() const;
-	void apilar(char tipo);
-	char desapilar();
+	bool puedeIntercambiar() const;	
 	
-	bool puedeIntercambiar() const;
+	char desapilar();
+	char verPieza() const;
+	
+	void apilar(char tipo);
 	void bloquear();
 	void desbloquear();
 };

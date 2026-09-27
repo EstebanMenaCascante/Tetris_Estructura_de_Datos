@@ -18,6 +18,8 @@ private:
     Pieza piezaActual;
     Jugador jugadorActual;
 
+	const int PUNTAJE_BASE = 50;
+	
     int pantalla; 
     float tiempoCaida;
     float velocidadCaida;
@@ -34,24 +36,26 @@ private:
     std::string nombreTemp; //almacena temporalmente el nombre del jugador mientras lo escribe
     int framesCursor;
 
-    void cargarFotogramaPelicula();
-
-    void actualizarInicio();
-    void actualizarEscribirNombre();
-    void actualizarJugando(float deltaTime);
-    void actualizarPausa();
-    void actualizarGameOver();
-    void actualizarPelicula(float deltaTime);
-
-    void dibujarInicio();
-    void dibujarEscribirNombre(); 
-    void dibujarJugando();
-    void dibujarPausa();
-    void dibujarGameOver();
-    void dibujarPelicula();
+    
 
 public:
     Juego();
+	void cargarFotogramaPelicula();
+	
+	void actualizarInicio();
+	void actualizarEscribirNombre();
+	void actualizarJugando(float deltaTime);
+	void actualizarPausa();
+	void actualizarGameOver();
+	void actualizarPelicula(float deltaTime);
+	
+	void dibujarInicio();
+	void dibujarEscribirNombre(); 
+	void dibujarJugando();
+	void dibujarPausa();
+	void dibujarGameOver();
+	void dibujarPelicula();
+	
     void actualizar(float deltaTime);
     void dibujar();
 };

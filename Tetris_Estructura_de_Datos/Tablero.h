@@ -16,26 +16,23 @@ private:
 
 	static const int FILAS = 20;
 	static const int COLUMNAS = 10;
-	
+
 public:
 	Tablero();
 	~Tablero();
 
-	void reiniciar();
-	
 	NodoFila *obtenerFila(int numeroFila) const;
 
+	void reiniciar();
 	void colocarCelda(int fila, int columna, int valor);
-
-	int obtenerCelda(int fila,int columna) const;
-
-	int limpiarFilas();
-	
-	bool filaCompleta(int fila) const;
 	void eliminarFila(int fila);
 	void insertarFilaVaciaInicio();
-
 	void dibujar(int xInicial, int yInicial, int tamCelda) const;
+
+	int obtenerCelda(int fila, int columna) const;
+	int limpiarFilas();
+
+	bool filaCompleta(int fila) const;
 };
 
 #endif

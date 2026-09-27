@@ -16,7 +16,7 @@ private:
 	NodoCola *final;
 	int cantidad;
 
-	void generarBolsa();
+	
 
 public:
 	ColaPiezas();
@@ -26,6 +26,7 @@ public:
 	char desencolar();
 	char verSiguiente(int indice) const;
 	void rellenarSiEsNecesario();
+	void generarBolsa();
 };
 
 #endif
