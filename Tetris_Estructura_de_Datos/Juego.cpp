@@ -358,7 +358,7 @@ void Juego::actualizarJugando(float deltaTime)
 
 void Juego::dibujarInicio()
 {
-	DrawText("TETRIS UNA", 250, 150, 40, RAYWHITE);
+	DrawText("TETRIS UNA", 320, 150, 40, RAYWHITE);
 	DrawText(TextFormat("Jugador actual: %s", jugadorActual.getNombre().c_str()), 330, 220, 20, LIGHTGRAY);
 
 	Rectangle btnJugar = {350, 300, 200, 50};
@@ -377,12 +377,12 @@ void Juego::dibujarInicio()
 
 void Juego::dibujarJugando()
 {
-	DrawText("TETRIS", 60, 60, 50, RAYWHITE);
-	DrawText("Estructuras de Datos", 30, 120, 24, GRAY);
+	DrawText("TETRIS", 50, 100, 50, RAYWHITE);
+	//DrawText("UNA", 60, 120, 30, GRAY);
 	tablero.dibujar(320, 60, 28);
 	dibujarPieza(piezaActual, 320, 60, 28);
 
-	DrawText("TABLERO", 650, 100, 28, RAYWHITE);
+	DrawText("TABLERO", 390, 30, 28, RAYWHITE);
 	DrawText("Cambio (Tecla C)", 50, 200, 20, RAYWHITE);
 	DrawText("Deshacer (Tecla Z)", 50, 320, 20, RAYWHITE);
 	DrawText("Rehacer (Tecla X)", 50, 380, 20, RAYWHITE);
@@ -396,13 +396,13 @@ void Juego::dibujarJugando()
 		dibujarPieza(pHold, 50, 240, 28);
 	}
 
-	DrawText("SIGUIENTES", 650, 300, 20, RAYWHITE);
+	DrawText("SIGUIENTES", 650, 150, 20, RAYWHITE);
 	for (int i = 0; i < 3; i++)
 	{
 		Pieza pSiguiente = crearPieza(cola.verSiguiente(i));
 		pSiguiente.x = 0;
 		pSiguiente.y = 0;
-		dibujarPieza(pSiguiente, 650, 340 + (i * 90), 28);
+		dibujarPieza(pSiguiente, 650, 200 + (i * 90), 28);
 	}
 
 	// Mostrar Puntaje y Tiempo
@@ -411,7 +411,7 @@ void Juego::dibujarJugando()
 	{
 		DrawText(TextFormat("+%i", jugadorActual.getUltimoPuntaje()), 650, 70, 20, YELLOW);
 	}
-	DrawText(TextFormat("Tiempo: %.0f seg", jugadorActual.getTiempoPartida()), 650, 140, 20, RAYWHITE);
+	DrawText(TextFormat("Tiempo: %.0f seg", jugadorActual.getTiempoPartida()), 650, 100, 20, RAYWHITE);
 }
 
 void Juego::dibujarPausa()
@@ -429,7 +429,7 @@ void Juego::dibujarPausa()
 
 void Juego::dibujarGameOver()
 {
-	DrawText("GAME OVER", 330, 120, 50, RED);
+	DrawText("GAME OVER", 300, 120, 50, RED);
 
 	DrawText(TextFormat("Jugador: %s", jugadorActual.getNombre().c_str()), 300, 230, 25, RAYWHITE);
 	DrawText(TextFormat("Puntaje Total: %i", jugadorActual.getPuntaje()), 300, 280, 25, GREEN);
