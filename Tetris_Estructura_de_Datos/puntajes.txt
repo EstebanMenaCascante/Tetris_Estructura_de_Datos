@@ -4,7 +4,7 @@ Carlos 1400
 Josue 475
 Fulano 400
 Alonso 300
+Josue 200
 Andres 150
 Erick 150
 Josue 100
-Emena 100
