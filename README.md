@@ -1,6 +1,6 @@
 # Tetris - Estructuras de Datos
 
-Proyecto académico de **Estructuras de Datos** de la Universidad Nacional de Costa Rica. Es una versión de Tetris desarrollada en C++ que utiliza estructuras de datos lineales implementadas dentro del proyecto y una interfaz gráfica basada en Raylib.
+Proyecto académico de **Estructuras de Datos** de la Universidad Nacional de Costa Rica (UNA). Es una versión de Tetris desarrollada en C++ que utiliza estructuras de datos lineales implementadas dentro del proyecto y una interfaz gráfica basada en Raylib.
 
 El objetivo es aplicar colas, pilas, listas enlazadas y algoritmos de ordenamiento a las mecánicas principales del juego, manteniendo una solución clara y fácil de explicar durante la defensa.
 
@@ -153,4 +153,4 @@ Este README resume el funcionamiento y la organización del código. La justific
 
 ## Autoría
 
-Proyecto desarrollado para el curso **EIF207 Estructuras de Datos**.
+Proyecto desarrollado para el curso **Estructuras de Datos** por el estudiante **Esteban Josué Mena Cascante**, en el año **2026**.
