@@ -1,5 +1,6 @@
+Sofia 4000
+Esteban 1500
+Josue 475
 Josue 100
 Emena 50
 Invitado 50
-Esteban 1500
-Sofia 4000

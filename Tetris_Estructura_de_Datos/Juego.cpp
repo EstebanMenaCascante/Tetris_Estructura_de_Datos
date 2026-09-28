@@ -95,41 +95,73 @@ void Juego::ejecutarEvento(Evento e)
 void Juego::actualizar(float deltaTime)
 {
     if (pantalla == 0)
+    {
         actualizarInicio();
+    }
     else if (pantalla == 1)
+    {
         actualizarJugando(deltaTime);
+    }
     else if (pantalla == 2)
+    {
         actualizarPausa();
+    }
     else if (pantalla == 3)
+    {
         actualizarGameOver();
+    }
     else if (pantalla == 4)
+    {
         actualizarPelicula(deltaTime);
+    }
     else if (pantalla == 5)
+    {
         actualizarEscribirNombre();
+    }
     else if (pantalla == 6)
+    {
         actualizarEstadisticas();
+    }
     else if (pantalla == 7)
+    {
         actualizarComodin();
+    }
 }
 
 void Juego::dibujar()
 {
     if (pantalla == 0)
+    {
         dibujarInicio();
+    }
     else if (pantalla == 1)
+    {
         dibujarJugando();
+    }
     else if (pantalla == 2)
+    {
         dibujarPausa();
+    }
     else if (pantalla == 3)
+    {
         dibujarGameOver();
+    }
     else if (pantalla == 4)
+    {
         dibujarPelicula();
+    }
     else if (pantalla == 5)
+    {
         dibujarEscribirNombre();
+    }
     else if (pantalla == 6)
+    {
         dibujarEstadisticas();
+    }
     else if (pantalla == 7)
+    {
         dibujarComodin();
+    }
 }
 
 void Juego::actualizarInicio()
@@ -252,7 +284,18 @@ void Juego::dibujarEstadisticas()
 
     Rectangle btnMetodo = {300, 100, 300, 40};
     DrawRectangleRec(btnMetodo, DARKBLUE);
-    const char *textoMetodo = (metodoOrdenamiento == 0) ? "Orden: Insertion Sort (O(n^2))" : "Orden: Merge Sort (O(n log n))";
+
+    const char *textoMetodo;
+
+    if (metodoOrdenamiento == 0)
+    {
+        textoMetodo = "Orden: Insertion Sort (O(n^2))";
+    }
+    else
+    {
+        textoMetodo = "Orden: Merge Sort (O(n log n))";
+    }
+
     DrawText(textoMetodo, 315, 110, 18, RAYWHITE);
 
     int y = 180;
@@ -481,435 +524,460 @@ void Juego::actualizarJugando(float deltaTime)
     if (controlesInvertidos)
     {
         if (IsKeyPressed(KEY_RIGHT) || (IsKeyDown(KEY_RIGHT) && tiempoMovLateral >= retardoMovimiento))
+        {
             intentoIzquierda = true;
+        }
         if (IsKeyPressed(KEY_LEFT) || (IsKeyDown(KEY_LEFT) && tiempoMovLateral >= retardoMovimiento))
+        {
             intentoDerecha = true;
+        }
         if (IsKeyPressed(KEY_DOWN))
+        {
             intentoRotar = true;
+        }
         if (IsKeyPressed(KEY_UP))
+        {
             intentoHardDrop = true;
+        }
     }
     else
     {
         if (IsKeyPressed(KEY_LEFT) || (IsKeyDown(KEY_LEFT) && tiempoMovLateral >= retardoMovimiento))
-            intentoIzquierda = true;
-        if (IsKeyPressed(KEY_RIGHT) || (IsKeyDown(KEY_RIGHT) && tiempoMovLateral >= retardoMovimiento))
-            intentoDerecha = true;
-        if (IsKeyPressed(KEY_UP))
-            intentoRotar = true;
-        if (IsKeyDown(KEY_DOWN))
-            intentoBajar = true;
-    }
-
-    if (intentoIzquierda)
-    {
-        if (!principalBloqueado)
-            moverPieza(piezaActual, -1, 0, tablero);
-        if (piezaEspejoActiva && !espejoBloqueado)
-            moverPieza(piezaEspejo, 1, 0, tablero); // Opuesto
-        tiempoMovLateral = 0.0f;
-        hizoMovimiento = true;
-    }
-    if (intentoDerecha)
-    {
-        if (!principalBloqueado)
-            moverPieza(piezaActual, 1, 0, tablero);
-        if (piezaEspejoActiva && !espejoBloqueado)
-            moverPieza(piezaEspejo, -1, 0, tablero); // Opuesto
-        tiempoMovLateral = 0.0f;
-        hizoMovimiento = true;
-    }
-    if (intentoRotar)
-    {
-        if (!principalBloqueado)
-            rotarPieza(piezaActual, tablero);
-        if (piezaEspejoActiva && !espejoBloqueado)
-        {
-            // Rotar 3 veces = dirección contraria
-            rotarPieza(piezaEspejo, tablero);
-            rotarPieza(piezaEspejo, tablero);
-            rotarPieza(piezaEspejo, tablero);
-        }
-        hizoMovimiento = true;
-    }
-    if (intentoHardDrop)
-    {
-        if (!principalBloqueado)
-            while (moverPieza(piezaActual, 0, 1, tablero))
-                ;
-        if (piezaEspejoActiva && !espejoBloqueado)
-            while (moverPieza(piezaEspejo, 0, 1, tablero))
-                ;
-        tiempoCaida = velocidadCaida; // Forzar para colocar instantáneamente
-        hizoMovimiento = true;
-    }
-    if (intentoBajar)
-    {
-        velocidadCaida = 0.05f;
-        hizoMovimiento = true;
-    }
-    else
-    {
-        velocidadCaida = 0.5f;
-    }
-
-    // Cambio de pieza con Hold
-    if (IsKeyPressed(KEY_C) && hold.puedeIntercambiar() && !principalBloqueado)
-    {
-        if (hold.estaVacia())
-        {
-            hold.apilar(piezaActual.tipo);
-            if (piezaComodinReservada != ' ')
             {
-                piezaActual = crearPieza(piezaComodinReservada);
-                piezaComodinReservada = ' ';
+                intentoIzquierda = true;
+            }
+            if (IsKeyPressed(KEY_RIGHT) || (IsKeyDown(KEY_RIGHT) && tiempoMovLateral >= retardoMovimiento))
+            {
+                intentoDerecha = true;
+            }
+            if (IsKeyPressed(KEY_UP))
+            {
+                intentoRotar = true;
+            }
+            if (IsKeyDown(KEY_DOWN))
+            {
+                intentoBajar = true;
+            }
+        }
+
+        if (intentoIzquierda)
+        {
+                if (!principalBloqueado)
+                    moverPieza(piezaActual, -1, 0, tablero);
+                if (piezaEspejoActiva && !espejoBloqueado)
+                    moverPieza(piezaEspejo, 1, 0, tablero); // Opuesto
+                tiempoMovLateral = 0.0f;
+                hizoMovimiento = true;
+            }
+            if (intentoDerecha)
+            {
+                if (!principalBloqueado)
+                    moverPieza(piezaActual, 1, 0, tablero);
+                if (piezaEspejoActiva && !espejoBloqueado)
+                    moverPieza(piezaEspejo, -1, 0, tablero); // Opuesto
+                tiempoMovLateral = 0.0f;
+                hizoMovimiento = true;
+            }
+            if (intentoRotar)
+            {
+                if (!principalBloqueado)
+                    rotarPieza(piezaActual, tablero);
+                if (piezaEspejoActiva && !espejoBloqueado)
+                {
+                    // Rotar 3 veces = dirección contraria
+                    rotarPieza(piezaEspejo, tablero);
+                    rotarPieza(piezaEspejo, tablero);
+                    rotarPieza(piezaEspejo, tablero);
+                }
+                hizoMovimiento = true;
+            }
+            if (intentoHardDrop)
+            {
+                if (!principalBloqueado)
+                    while (moverPieza(piezaActual, 0, 1, tablero))
+                        ;
+                if (piezaEspejoActiva && !espejoBloqueado)
+                    while (moverPieza(piezaEspejo, 0, 1, tablero))
+                        ;
+                tiempoCaida = velocidadCaida; // Forzar para colocar instantáneamente
+                hizoMovimiento = true;
+            }
+            if (intentoBajar)
+            {
+                velocidadCaida = 0.05f;
+                hizoMovimiento = true;
             }
             else
             {
-                piezaActual = crearPieza(cola.desencolar());
-                cola.rellenarSiEsNecesario();
+                velocidadCaida = 0.5f;
             }
-        }
-        else
-        {
-            char guardada = hold.desapilar();
-            hold.apilar(piezaActual.tipo);
-            piezaActual = crearPieza(guardada);
-        }
 
-        // El Hold desactiva los efectos de piezas raras para evitar bugs
-        piezaEspejoActiva = false;
-        bombaActiva = false;
-
-        hold.bloquear();
-        hizoMovimiento = true;
-    }
-
-    // Controles de deshacer y rehacer
-    bool intentarDeshacer = false;
-    bool intentarRehacer = false;
-
-    if (IsKeyPressed(KEY_Z))
-    {
-        intentarDeshacer = true;
-        tiempoReplay = 0.0f;
-    }
-    else if (IsKeyDown(KEY_Z))
-    {
-        tiempoReplay += deltaTime;
-        if (tiempoReplay >= retardoReplay)
-        {
-            intentarDeshacer = true;
-            tiempoReplay = 0.0f;
-        }
-    }
-    if (IsKeyPressed(KEY_X))
-    {
-        intentarRehacer = true;
-        tiempoReplay = 0.0f;
-    }
-    else if (IsKeyDown(KEY_X))
-    {
-        tiempoReplay += deltaTime;
-        if (tiempoReplay >= retardoReplay)
-        {
-            intentarRehacer = true;
-            tiempoReplay = 0.0f;
-        }
-    }
-
-    if (intentarDeshacer && historial.puedeDeshacer())
-    {
-        EstadoJuego deshacer = historial.deshacer();
-        piezaActual = deshacer.piezaActual;
-        for (int fila = 0; fila < 20; fila++)
-        {
-            for (int col = 0; col < 10; col++)
+            // Cambio de pieza con Hold
+            if (IsKeyPressed(KEY_C) && hold.puedeIntercambiar() && !principalBloqueado)
             {
-                tablero.colocarCelda(fila, col, deshacer.tableroRepleay[fila][col]);
-            }
-        }
-        if (!hold.estaVacia())
-            hold.desapilar();
-        if (!deshacer.holdVacio)
-            hold.apilar(deshacer.piezaHold);
-        if (deshacer.holdBloqueado)
-            hold.bloquear();
-        else
-            hold.desbloquear();
-        tiempoCaida = 0.0f;
-        piezaEspejoActiva = false;
-        bombaActiva = false;
-        principalBloqueado = false;
-    }
-
-    if (intentarRehacer && historial.puedeRehacer())
-    {
-        EstadoJuego rehacer = historial.rehacer();
-        piezaActual = rehacer.piezaActual;
-        for (int fila = 0; fila < 20; fila++)
-        {
-            for (int col = 0; col < 10; col++)
-            {
-                tablero.colocarCelda(fila, col, rehacer.tableroRepleay[fila][col]);
-            }
-        }
-        if (!hold.estaVacia())
-            hold.desapilar();
-        if (!rehacer.holdVacio)
-            hold.apilar(rehacer.piezaHold);
-        if (rehacer.holdBloqueado)
-            hold.bloquear();
-        else
-            hold.desbloquear();
-        tiempoCaida = 0.0f;
-        piezaEspejoActiva = false;
-        bombaActiva = false;
-        principalBloqueado = false;
-    }
-
-    if (hizoMovimiento)
-    {
-        historial.registrarEstado(piezaActual, tablero, hold);
-    }
-
-    if (IsKeyPressed(KEY_P))
-    {
-        pantalla = 2;
-    }
-}
-
-void Juego::dibujarInicio()
-{
-    DrawText("TETRIS UNA", 330, 150, 40, RAYWHITE);
-    DrawText(TextFormat("Jugador actual: %s", jugadorActual.getNombre().c_str()), 330, 220, 20, LIGHTGRAY);
-
-    Rectangle btnJugar = {350, 300, 200, 50};
-    Rectangle btnJugador = {350, 380, 200, 50};
-    Rectangle btnStats = {350, 460, 200, 50};
-
-    DrawRectangleRec(btnJugar, GREEN);
-    DrawText("JUGAR", 415, 315, 20, BLACK);
-
-    DrawRectangleRec(btnJugador, BLUE);
-    DrawText("Jugador", 410, 395, 20, WHITE);
-
-    DrawRectangleRec(btnStats, ORANGE);
-    DrawText("Top Jugadores", 380, 475, 20, BLACK);
-}
-
-void Juego::dibujarJugando()
-{
-    DrawText("TETRIS", 50, 60, 50, RAYWHITE);
-    // DrawText("Estructuras de Datos", 30, 120, 24, GRAY);
-
-    DrawText("TABLERO", 390, 20, 28, RAYWHITE);
-
-    tablero.dibujar(320, 60, 28);
-
-    // Dibujar piezas y efectos
-    if (!principalBloqueado)
-    {
-        dibujarPieza(piezaActual, 320, 60, 28);
-        if (bombaActiva)
-        {
-            for (int bloque = 0; bloque < 4; bloque++)
-            {
-                int c = obtenerXBloque(piezaActual, bloque);
-                int f = obtenerYBloque(piezaActual, bloque);
-                DrawRectangle(320 + c * 28, 60 + f * 28, 28, 28, Color{255, 0, 0, 150}); // Brillo rojo
-            }
-        }
-    }
-
-    if (piezaEspejoActiva && !espejoBloqueado)
-    {
-        dibujarPieza(piezaEspejo, 320, 60, 28);
-        for (int bloque = 0; bloque < 4; bloque++)
-        {
-            int c = obtenerXBloque(piezaEspejo, bloque);
-            int f = obtenerYBloque(piezaEspejo, bloque);
-            DrawRectangle(320 + c * 28, 60 + f * 28, 28, 28, Color{200, 0, 255, 100}); // Brillo violeta
-        }
-    }
-
-    // Indicadores de evento
-    if (temporizadorAlerta > 0)
-    {
-        int wAlerta = MeasureText(textoAlerta.c_str(), 30);
-        DrawText(textoAlerta.c_str(), 450 - wAlerta / 2, 640, 30, YELLOW);
-    }
-    if (controlesInvertidos)
-    {
-        DrawText("¡CONTROLES INVERTIDOS ACTIVOS!", 50, 460, 15, RED);
-    }
-
-    DrawText("Cambio (Tecla C)", 50, 200, 20, RAYWHITE);
-
-    if (!hold.estaVacia())
-    {
-        Pieza pHold = crearPieza(hold.verPieza());
-        pHold.x = 0;
-        pHold.y = 0;
-        dibujarPieza(pHold, 50, 240, 28);
-    }
-
-    DrawText("Controles:", 50, 330, 22, RAYWHITE);
-    DrawText("[Z] Deshacer paso", 50, 360, 18, LIGHTGRAY);
-    DrawText("[X] Rehacer paso", 50, 390, 18, LIGHTGRAY);
-    DrawText("[P] Pausar juego", 50, 420, 18, LIGHTGRAY);
-
-    DrawText("SIGUIENTES", 650, 250, 20, RAYWHITE);
-    for (int i = 0; i < 3; i++)
-    {
-        Pieza pSiguiente = crearPieza(cola.verSiguiente(i));
-        pSiguiente.x = 0;
-        pSiguiente.y = 0;
-        dibujarPieza(pSiguiente, 650, 290 + (i * 90), 28);
-    }
-
-    DrawText(TextFormat("PUNTAJE: %i", jugadorActual.getPuntaje()), 650, 40, 25, GREEN);
-    if (jugadorActual.getUltimoPuntaje() > 0)
-    {
-        DrawText(TextFormat("+%i", jugadorActual.getUltimoPuntaje()), 650, 70, 20, YELLOW);
-    }
-    DrawText(TextFormat("Tiempo: %.0f seg", jugadorActual.getTiempoPartida()), 650, 140, 20, RAYWHITE);
-}
-
-void Juego::dibujarPausa()
-{
-    dibujarJugando();
-    DrawRectangle(0, 0, 900, 700, Color{0, 0, 0, 200});
-
-    DrawText("PAUSA", 370, 200, 50, YELLOW);
-    DrawText(TextFormat("Jugador: %s", jugadorActual.getNombre().c_str()), 350, 300, 25, RAYWHITE);
-    DrawText(TextFormat("Puntaje Actual: %i", jugadorActual.getPuntaje()), 350, 350, 25, GREEN);
-    DrawText(TextFormat("Tiempo: %.0f seg", jugadorActual.getTiempoPartida()), 350, 400, 25, RAYWHITE);
-
-    DrawText("Presiona [P] para continuar", 300, 500, 20, GRAY);
-}
-
-void Juego::dibujarGameOver()
-{
-    DrawText("GAME OVER", 300, 120, 50, RED);
-
-    DrawText(TextFormat("Jugador: %s", jugadorActual.getNombre().c_str()), 300, 230, 25, RAYWHITE);
-    DrawText(TextFormat("Puntaje Total: %i", jugadorActual.getPuntaje()), 300, 280, 25, GREEN);
-    DrawText(TextFormat("Tiempo de Juego: %.0f seg", jugadorActual.getTiempoPartida()), 300, 330, 25, RAYWHITE);
-    DrawText(TextFormat("Lineas Totales: %i", jugadorActual.getLineasTotales()), 300, 380, 25, RAYWHITE);
-    DrawText(TextFormat("Mejor Combo: %i lineas", jugadorActual.getMaxLineasCombo()), 300, 430, 25, YELLOW);
-
-    DrawText("Presiona [R] para ver el Replay", 250, 550, 25, LIGHTGRAY);
-}
-
-void Juego::cargarFotogramaPelicula()
-{
-    if (nodoPelicula != nullptr)
-    {
-        piezaActual = nodoPelicula->estado.piezaActual;
-        for (int fila = 0; fila < 20; fila++)
-        {
-            for (int col = 0; col < 10; col++)
-            {
-                tablero.colocarCelda(fila, col, nodoPelicula->estado.tableroRepleay[fila][col]);
-            }
-        }
-    }
-}
-
-void Juego::actualizarPelicula(float deltaTime)
-{
-    Vector2 raton = GetMousePosition();
-
-    Rectangle btnAtras = {85, 620, 130, 40};
-    Rectangle btnPausa = {235, 620, 130, 40};
-    Rectangle btnAdelante = {385, 620, 130, 40};
-    Rectangle btnVelocidad = {535, 620, 130, 40};
-    Rectangle btnSalir = {685, 620, 130, 40};
-
-    if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
-    {
-        tiempoReplay += deltaTime;
-        if (tiempoReplay >= 0.05f)
-        {
-            if (CheckCollisionPointRec(raton, btnAtras))
-            {
-                if (nodoPelicula != nullptr && nodoPelicula->anterior != nullptr)
+                if (hold.estaVacia())
                 {
-                    nodoPelicula = nodoPelicula->anterior;
-                    cargarFotogramaPelicula();
-                    peliculaPausada = true;
+                    hold.apilar(piezaActual.tipo);
+                    if (piezaComodinReservada != ' ')
+                    {
+                        piezaActual = crearPieza(piezaComodinReservada);
+                        piezaComodinReservada = ' ';
+                    }
+                    else
+                    {
+                        piezaActual = crearPieza(cola.desencolar());
+                        cola.rellenarSiEsNecesario();
+                    }
                 }
+                else
+                {
+                    char guardada = hold.desapilar();
+                    hold.apilar(piezaActual.tipo);
+                    piezaActual = crearPieza(guardada);
+                }
+
+                // El Hold desactiva los efectos de piezas raras para evitar bugs
+                piezaEspejoActiva = false;
+                bombaActiva = false;
+
+                hold.bloquear();
+                hizoMovimiento = true;
+            }
+
+            // Controles de deshacer y rehacer
+            bool intentarDeshacer = false;
+            bool intentarRehacer = false;
+
+            if (IsKeyPressed(KEY_Z))
+            {
+                intentarDeshacer = true;
                 tiempoReplay = 0.0f;
             }
-            else if (CheckCollisionPointRec(raton, btnAdelante))
+            else if (IsKeyDown(KEY_Z))
             {
-                if (nodoPelicula != nullptr && nodoPelicula->siguiente != nullptr)
+                tiempoReplay += deltaTime;
+                if (tiempoReplay >= retardoReplay)
                 {
-                    nodoPelicula = nodoPelicula->siguiente;
-                    cargarFotogramaPelicula();
-                    peliculaPausada = true;
+                    intentarDeshacer = true;
+                    tiempoReplay = 0.0f;
                 }
+            }
+            if (IsKeyPressed(KEY_X))
+            {
+                intentarRehacer = true;
                 tiempoReplay = 0.0f;
             }
-        }
-    }
-
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
-    {
-        if (CheckCollisionPointRec(raton, btnPausa))
-            peliculaPausada = !peliculaPausada;
-        else if (CheckCollisionPointRec(raton, btnVelocidad))
-        {
-            if (velocidadPelicula == 0.15f)
-                velocidadPelicula = 0.05f;
-            else
-                velocidadPelicula = 0.15f;
-        }
-        else if (CheckCollisionPointRec(raton, btnSalir))
-            pantalla = 3;
-    }
-
-    if (!peliculaPausada)
-    {
-        tiempoPelicula += deltaTime;
-        if (tiempoPelicula >= velocidadPelicula)
-        {
-            tiempoPelicula = 0.0f;
-            if (nodoPelicula != nullptr && nodoPelicula->siguiente != nullptr)
+            else if (IsKeyDown(KEY_X))
             {
-                nodoPelicula = nodoPelicula->siguiente;
-                cargarFotogramaPelicula();
+                tiempoReplay += deltaTime;
+                if (tiempoReplay >= retardoReplay)
+                {
+                    intentarRehacer = true;
+                    tiempoReplay = 0.0f;
+                }
+            }
+
+            if (intentarDeshacer && historial.puedeDeshacer())
+            {
+                EstadoJuego deshacer = historial.deshacer();
+                piezaActual = deshacer.piezaActual;
+                for (int fila = 0; fila < 20; fila++)
+                {
+                    for (int col = 0; col < 10; col++)
+                    {
+                        tablero.colocarCelda(fila, col, deshacer.tableroRepleay[fila][col]);
+                    }
+                }
+                if (!hold.estaVacia())
+                    hold.desapilar();
+                if (!deshacer.holdVacio)
+                    hold.apilar(deshacer.piezaHold);
+                if (deshacer.holdBloqueado)
+                    hold.bloquear();
+                else
+                    hold.desbloquear();
+                tiempoCaida = 0.0f;
+                piezaEspejoActiva = false;
+                bombaActiva = false;
+                principalBloqueado = false;
+            }
+
+            if (intentarRehacer && historial.puedeRehacer())
+            {
+                EstadoJuego rehacer = historial.rehacer();
+                piezaActual = rehacer.piezaActual;
+                for (int fila = 0; fila < 20; fila++)
+                {
+                    for (int col = 0; col < 10; col++)
+                    {
+                        tablero.colocarCelda(fila, col, rehacer.tableroRepleay[fila][col]);
+                    }
+                }
+                if (!hold.estaVacia())
+                {
+                    hold.desapilar();
+                }
+                if (!rehacer.holdVacio)
+                {
+                    hold.apilar(rehacer.piezaHold);
+                }
+                if (rehacer.holdBloqueado)
+                {
+                    hold.bloquear();
+                }
+                else
+                {
+                    hold.desbloquear();
+                }
+                tiempoCaida = 0.0f;
+                piezaEspejoActiva = false;
+                bombaActiva = false;
+                principalBloqueado = false;
+            }
+
+            if (hizoMovimiento)
+            {
+                historial.registrarEstado(piezaActual, tablero, hold);
+            }
+
+            if (IsKeyPressed(KEY_P))
+            {
+                pantalla = 2;
             }
         }
-    }
-}
 
-void Juego::dibujarPelicula()
-{
-    DrawText("REPRODUCIENDO PARTIDA...", 250, 20, 25, GREEN);
+        void Juego::dibujarInicio()
+        {
+            DrawText("TETRIS UNA", 330, 150, 40, RAYWHITE);
+            DrawText(TextFormat("Jugador actual: %s", jugadorActual.getNombre().c_str()), 330, 220, 20, LIGHTGRAY);
 
-    tablero.dibujar(320, 60, 28);
-    dibujarPieza(piezaActual, 320, 60, 28);
+            Rectangle btnJugar = {350, 300, 200, 50};
+            Rectangle btnJugador = {350, 380, 200, 50};
+            Rectangle btnStats = {350, 460, 200, 50};
 
-    Rectangle btnAtras = {85, 620, 130, 40};
-    Rectangle btnPausa = {235, 620, 130, 40};
-    Rectangle btnAdelante = {385, 620, 130, 40};
-    Rectangle btnVelocidad = {535, 620, 130, 40};
-    Rectangle btnSalir = {685, 620, 130, 40};
+            DrawRectangleRec(btnJugar, GREEN);
+            DrawText("JUGAR", 415, 315, 20, BLACK);
 
-    DrawRectangleRec(btnAtras, DARKGRAY);
-    DrawText("<<< Atras", 100, 630, 20, WHITE);
+            DrawRectangleRec(btnJugador, BLUE);
+            DrawText("Jugador", 410, 395, 20, WHITE);
 
-    DrawRectangleRec(btnPausa, peliculaPausada ? MAROON : DARKBLUE);
-    DrawText(peliculaPausada ? "Reproducir" : "Pausar", 255, 630, 20, WHITE);
+            DrawRectangleRec(btnStats, ORANGE);
+            DrawText("Top Jugadores", 380, 475, 20, BLACK);
+        }
 
-    DrawRectangleRec(btnAdelante, DARKGRAY);
-    DrawText("Adelante >>>", 390, 630, 20, WHITE);
+        void Juego::dibujarJugando()
+        {
+            DrawText("TETRIS", 50, 60, 50, RAYWHITE);
+            // DrawText("Estructuras de Datos", 30, 120, 24, GRAY);
 
-    DrawRectangleRec(btnVelocidad, ORANGE);
-    DrawText(velocidadPelicula == 0.15f ? "Velocidad: x1" : "Velocidad: x3", 540, 630, 18, BLACK);
+            DrawText("TABLERO", 390, 20, 28, RAYWHITE);
 
-    DrawRectangleRec(btnSalir, RED);
-    DrawText("Salir", 725, 630, 20, WHITE);
-}
+            tablero.dibujar(320, 60, 28);
+
+            // Dibujar piezas y efectos
+            if (!principalBloqueado)
+            {
+                dibujarPieza(piezaActual, 320, 60, 28);
+                if (bombaActiva)
+                {
+                    for (int bloque = 0; bloque < 4; bloque++)
+                    {
+                        int c = obtenerXBloque(piezaActual, bloque);
+                        int f = obtenerYBloque(piezaActual, bloque);
+                        DrawRectangle(320 + c * 28, 60 + f * 28, 28, 28, Color{255, 0, 0, 150}); // Brillo rojo
+                    }
+                }
+            }
+
+            if (piezaEspejoActiva && !espejoBloqueado)
+            {
+                dibujarPieza(piezaEspejo, 320, 60, 28);
+                for (int bloque = 0; bloque < 4; bloque++)
+                {
+                    int c = obtenerXBloque(piezaEspejo, bloque);
+                    int f = obtenerYBloque(piezaEspejo, bloque);
+                    DrawRectangle(320 + c * 28, 60 + f * 28, 28, 28, Color{200, 0, 255, 100}); // Brillo violeta
+                }
+            }
+
+            // Indicadores de evento
+            if (temporizadorAlerta > 0)
+            {
+                int wAlerta = MeasureText(textoAlerta.c_str(), 30);
+                DrawText(textoAlerta.c_str(), 450 - wAlerta / 2, 640, 30, YELLOW);
+            }
+            if (controlesInvertidos)
+            {
+                DrawText("¡CONTROLES INVERTIDOS ACTIVOS!", 50, 460, 15, RED);
+            }
+
+            DrawText("Cambio (Tecla C)", 50, 200, 20, RAYWHITE);
+
+            if (!hold.estaVacia())
+            {
+                Pieza pHold = crearPieza(hold.verPieza());
+                pHold.x = 0;
+                pHold.y = 0;
+                dibujarPieza(pHold, 50, 240, 28);
+            }
+
+            DrawText("Controles:", 50, 330, 22, RAYWHITE);
+            DrawText("[Z] Deshacer paso", 50, 360, 18, LIGHTGRAY);
+            DrawText("[X] Rehacer paso", 50, 390, 18, LIGHTGRAY);
+            DrawText("[P] Pausar juego", 50, 420, 18, LIGHTGRAY);
+
+            DrawText("SIGUIENTES", 650, 250, 20, RAYWHITE);
+            for (int i = 0; i < 3; i++)
+            {
+                Pieza pSiguiente = crearPieza(cola.verSiguiente(i));
+                pSiguiente.x = 0;
+                pSiguiente.y = 0;
+                dibujarPieza(pSiguiente, 650, 290 + (i * 90), 28);
+            }
+
+            DrawText(TextFormat("PUNTAJE: %i", jugadorActual.getPuntaje()), 650, 40, 25, GREEN);
+            if (jugadorActual.getUltimoPuntaje() > 0)
+            {
+                DrawText(TextFormat("+%i", jugadorActual.getUltimoPuntaje()), 650, 70, 20, YELLOW);
+            }
+            DrawText(TextFormat("Tiempo: %.0f seg", jugadorActual.getTiempoPartida()), 650, 140, 20, RAYWHITE);
+        }
+
+        void Juego::dibujarPausa()
+        {
+            dibujarJugando();
+            DrawRectangle(0, 0, 900, 700, Color{0, 0, 0, 200});
+
+            DrawText("PAUSA", 370, 200, 50, YELLOW);
+            DrawText(TextFormat("Jugador: %s", jugadorActual.getNombre().c_str()), 350, 300, 25, RAYWHITE);
+            DrawText(TextFormat("Puntaje Actual: %i", jugadorActual.getPuntaje()), 350, 350, 25, GREEN);
+            DrawText(TextFormat("Tiempo: %.0f seg", jugadorActual.getTiempoPartida()), 350, 400, 25, RAYWHITE);
+
+            DrawText("Presiona [P] para continuar", 300, 500, 20, GRAY);
+        }
+
+        void Juego::dibujarGameOver()
+        {
+            DrawText("GAME OVER", 300, 120, 50, RED);
+
+            DrawText(TextFormat("Jugador: %s", jugadorActual.getNombre().c_str()), 300, 230, 25, RAYWHITE);
+            DrawText(TextFormat("Puntaje Total: %i", jugadorActual.getPuntaje()), 300, 280, 25, GREEN);
+            DrawText(TextFormat("Tiempo de Juego: %.0f seg", jugadorActual.getTiempoPartida()), 300, 330, 25, RAYWHITE);
+            DrawText(TextFormat("Lineas Totales: %i", jugadorActual.getLineasTotales()), 300, 380, 25, RAYWHITE);
+            DrawText(TextFormat("Mejor Combo: %i lineas", jugadorActual.getMaxLineasCombo()), 300, 430, 25, YELLOW);
+
+            DrawText("Presiona [R] para ver el Replay", 250, 550, 25, LIGHTGRAY);
+        }
+
+        void Juego::cargarFotogramaPelicula()
+        {
+            if (nodoPelicula != nullptr)
+            {
+                piezaActual = nodoPelicula->estado.piezaActual;
+                for (int fila = 0; fila < 20; fila++)
+                {
+                    for (int col = 0; col < 10; col++)
+                    {
+                        tablero.colocarCelda(fila, col, nodoPelicula->estado.tableroRepleay[fila][col]);
+                    }
+                }
+            }
+        }
+
+        void Juego::actualizarPelicula(float deltaTime)
+        {
+            Vector2 raton = GetMousePosition();
+
+            Rectangle btnAtras = {85, 620, 130, 40};
+            Rectangle btnPausa = {235, 620, 130, 40};
+            Rectangle btnAdelante = {385, 620, 130, 40};
+            Rectangle btnVelocidad = {535, 620, 130, 40};
+            Rectangle btnSalir = {685, 620, 130, 40};
+
+            if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
+            {
+                tiempoReplay += deltaTime;
+                if (tiempoReplay >= 0.05f)
+                {
+                    if (CheckCollisionPointRec(raton, btnAtras))
+                    {
+                        if (nodoPelicula != nullptr && nodoPelicula->anterior != nullptr)
+                        {
+                            nodoPelicula = nodoPelicula->anterior;
+                            cargarFotogramaPelicula();
+                            peliculaPausada = true;
+                        }
+                        tiempoReplay = 0.0f;
+                    }
+                    else if (CheckCollisionPointRec(raton, btnAdelante))
+                    {
+                        if (nodoPelicula != nullptr && nodoPelicula->siguiente != nullptr)
+                        {
+                            nodoPelicula = nodoPelicula->siguiente;
+                            cargarFotogramaPelicula();
+                            peliculaPausada = true;
+                        }
+                        tiempoReplay = 0.0f;
+                    }
+                }
+            }
+
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+            {
+                if (CheckCollisionPointRec(raton, btnPausa))
+                    peliculaPausada = !peliculaPausada;
+                else if (CheckCollisionPointRec(raton, btnVelocidad))
+                {
+                    if (velocidadPelicula == 0.15f)
+                        velocidadPelicula = 0.05f;
+                    else
+                        velocidadPelicula = 0.15f;
+                }
+                else if (CheckCollisionPointRec(raton, btnSalir))
+                    pantalla = 3;
+                    
+            }
+
+            if (!peliculaPausada)
+            {
+                tiempoPelicula += deltaTime;
+                if (tiempoPelicula >= velocidadPelicula)
+                {
+                    tiempoPelicula = 0.0f;
+                    if (nodoPelicula != nullptr && nodoPelicula->siguiente != nullptr)
+                    {
+                        nodoPelicula = nodoPelicula->siguiente;
+                        cargarFotogramaPelicula();
+                    }
+                }
+            }
+        }
+
+        void Juego::dibujarPelicula()
+        {
+            DrawText("REPRODUCIENDO PARTIDA...", 250, 20, 25, GREEN);
+
+            tablero.dibujar(320, 60, 28);
+            dibujarPieza(piezaActual, 320, 60, 28);
+
+            Rectangle btnAtras = {85, 620, 130, 40};
+            Rectangle btnPausa = {235, 620, 130, 40};
+            Rectangle btnAdelante = {385, 620, 130, 40};
+            Rectangle btnVelocidad = {535, 620, 130, 40};
+            Rectangle btnSalir = {685, 620, 130, 40};
+
+            DrawRectangleRec(btnAtras, DARKGRAY);
+            DrawText("<<< Atras", 100, 630, 20, WHITE);
+
+            DrawRectangleRec(btnPausa, peliculaPausada ? MAROON : DARKBLUE);
+            DrawText(peliculaPausada ? "Reproducir" : "Pausar", 255, 630, 20, WHITE);
+
+            DrawRectangleRec(btnAdelante, DARKGRAY);
+            DrawText("Adelante >>>", 390, 630, 20, WHITE);
+
+            DrawRectangleRec(btnVelocidad, ORANGE);
+            DrawText(velocidadPelicula == 0.15f ? "Velocidad: x1" : "Velocidad: x3", 540, 630, 18, BLACK);
+
+            DrawRectangleRec(btnSalir, RED);
+            DrawText("Salir", 725, 630, 20, WHITE);
+        }
