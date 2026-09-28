@@ -77,7 +77,7 @@ void ColaPiezas::generarBolsa()
 	bool usadas[7] = {false, false, false, false, false, false, false}; // un poco de flags
 	int agregadas = 0; // contador de piezas agregadas
 
-	// Las 7 piezas sin repetir
+	// La bolsa garantiza que aparezcan las 7 piezas antes de comenzar otra.
 	while (agregadas < 7)
 	{
 		int aleatorio = rand() % 7; // del 0 al 6
@@ -93,7 +93,7 @@ void ColaPiezas::generarBolsa()
 
 void ColaPiezas::rellenarSiEsNecesario()
 {
-	// Rellena la cola cuando quedan 3 piezas o menos
+	// Se repone con anticipacion para que la vista de "siguientes" nunca quede vacia.
 	if (cantidad <= 3)
 	{
 		generarBolsa();

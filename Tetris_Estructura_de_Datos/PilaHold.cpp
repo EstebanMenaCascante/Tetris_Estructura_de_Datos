@@ -23,6 +23,8 @@ char PilaHold::verPieza() const {
 }
 
 void PilaHold::apilar(char tipo) {
+	// Solo existe una pieza en Hold: la primera operacion reserva memoria y
+	// las siguientes reemplazan el valor guardado.
 	if (elemento == nullptr) {
 		elemento = new char(tipo);
 	} else {
@@ -31,6 +33,7 @@ void PilaHold::apilar(char tipo) {
 }
 
 char PilaHold::desapilar() {
+	// Se devuelve la pieza y se libera el unico nodo dinamico de la pila.
 	if (elemento != nullptr) {
 		char tipo = *elemento;
 		delete elemento;

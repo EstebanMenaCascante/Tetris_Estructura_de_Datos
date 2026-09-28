@@ -21,6 +21,8 @@ void ColaEventos::encolar(Evento e) {
         return;
     }
 
+    // Se avanza hasta el ultimo evento que debe ir antes o al mismo tiempo.
+    // El <= conserva el orden de llegada cuando dos eventos coinciden.
     NodoEvento* actual = frente;
     while (actual->siguiente != nullptr && actual->siguiente->evento.tiempoActivacion <= e.tiempoActivacion) {
         actual = actual->siguiente;

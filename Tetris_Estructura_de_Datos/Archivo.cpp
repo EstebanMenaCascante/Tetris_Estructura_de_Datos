@@ -30,6 +30,8 @@ vector<RegistroPuntaje> Archivo::cargarPuntajes()
 
 void Archivo::guardarPuntaje(string nombre, int puntaje, int metodoOrdenamiento)
 {
+    // Se carga, agrega y vuelve a escribir el top para mantener el archivo
+    // ordenado y limitado a los diez mejores resultados.
     vector<RegistroPuntaje> lista = cargarPuntajes();
 
     RegistroPuntaje nuevo;
@@ -63,6 +65,7 @@ void Archivo::insertionSort(vector<RegistroPuntaje> &v)
     int n = static_cast<int>(v.size());
     for (int i = 1; i < n; i++)
     {
+        // Cada registro se inserta en la posicion correcta de la parte ya ordenada.
         RegistroPuntaje actual = v[i];
         int j = i - 1;
         // Se usa < en lugar de > para ordenar de mayor a menor
@@ -77,6 +80,7 @@ void Archivo::insertionSort(vector<RegistroPuntaje> &v)
 
 void Archivo::merge(vector<RegistroPuntaje> &v, int inicio, int medio, int fin)
 {
+    // Se mezclan dos mitades ordenadas eligiendo primero el puntaje mayor.
     // Mismo constructor de vector con iteradores del profe
     vector<RegistroPuntaje> izquierda(v.begin() + inicio, v.begin() + medio + 1);
     vector<RegistroPuntaje> derecha(v.begin() + medio + 1, v.begin() + fin + 1);
@@ -117,6 +121,7 @@ void Archivo::mergeSort(vector<RegistroPuntaje> &v, int inicio, int fin)
 {
     if (inicio >= fin)
         return;
+    // Divide hasta tener elementos individuales y luego los combina ordenados.
     int medio = inicio + (fin - inicio) / 2;
     mergeSort(v, inicio, medio);
     mergeSort(v, medio + 1, fin);

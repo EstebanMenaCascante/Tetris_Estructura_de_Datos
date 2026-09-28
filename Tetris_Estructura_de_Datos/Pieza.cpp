@@ -7,7 +7,11 @@ struct Coordenada
 	int y;
 };
 
-// Matriz de las coordenadas para los bloques
+// FORMAS[pieza][rotacion][bloque] guarda la coordenada relativa de cada uno
+// de los cuatro bloques que forman una pieza.
+// El primer indice sigue el orden I, O, T, S, Z, J, L; el segundo representa
+// las cuatro rotaciones posibles (0 a 3). Por eso no se calcula la rotacion
+// con formulas: se consulta directamente la forma correspondiente.
 const Coordenada FORMAS[7][4][4] =
 	{
 		{
@@ -67,6 +71,8 @@ int obtenerIndice(char letra)
 
 Pieza crearPieza(char tipo)
 {
+	// Todas las piezas nacen en la misma zona de aparicion; su forma real
+	// depende del tipo y de la rotacion almacenada en la estructura.
 	Pieza nueva;
 	nueva.tipo = tipo;
 	nueva.x = 3;
@@ -79,6 +85,8 @@ Pieza crearPieza(char tipo)
 int obtenerXBloque(const Pieza &pieza, int bloque)
 {
 	int indice = obtenerIndice(pieza.tipo);
+	// FORMAS contiene desplazamientos relativos. Se suman a x e y para
+	// obtener la coordenada absoluta de cada bloque en el tablero.
 	return pieza.x + FORMAS[indice][pieza.rotacion][bloque].x;
 }
 
@@ -121,6 +129,8 @@ void dibujarPieza(const Pieza &pieza, int xTablero, int yTablero, int tamCelda)
 
 bool posicionValida(const Pieza &pieza, const Tablero &tablero)
 {
+	// Una pieza es valida solo si sus cuatro bloques estan dentro del tablero
+	// y no ocupan una celda ya utilizada.
 	for (int bloque = 0; bloque < 4; bloque++)
 	{
 		int columna = obtenerXBloque(pieza, bloque);
@@ -146,6 +156,8 @@ bool posicionValida(const Pieza &pieza, const Tablero &tablero)
 
 bool moverPieza(Pieza &pieza, int movimientoX, int movimientoY, const Tablero &tablero)
 {
+	// Se prueba una copia antes de modificar la pieza real; si falla el choque,
+	// la pieza conserva exactamente su posicion anterior.
 	Pieza nuevaPosicion = pieza;
 
 	nuevaPosicion.x += movimientoX;
@@ -162,6 +174,8 @@ bool moverPieza(Pieza &pieza, int movimientoX, int movimientoY, const Tablero &t
 
 bool rotarPieza(Pieza &pieza, const Tablero &tablero)
 {
+	// La rotacion tambien se valida como movimiento tentativo para no atravesar
+	// paredes, piso u otras piezas.
 	Pieza nuevaRotacion = pieza;
 
 	nuevaRotacion.rotacion++;

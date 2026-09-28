@@ -24,6 +24,8 @@ void ListaReplay::eliminarFuturo() {
 		return;
 	}
 	
+	// Si se registra un nuevo movimiento despues de deshacer, los estados
+	// que estaban por delante ya no pertenecen a la nueva linea de juego.
 	NodoReplay* aBorrar = actual->siguiente;
 	while (aBorrar != nullptr) {
 		NodoReplay* temp = aBorrar;
@@ -35,6 +37,8 @@ void ListaReplay::eliminarFuturo() {
 
 void ListaReplay::registrarEstado(const Pieza& p, const Tablero& t, const PilaHold& h) {
 	eliminarFuturo(); 
+	// El replay guarda una copia, no referencias, para que el estado no cambie
+	// cuando el juego siga modificando el tablero.
 		NodoReplay* nuevo = new NodoReplay();
 
 	nuevo->estado.piezaActual = p;
@@ -61,6 +65,7 @@ void ListaReplay::registrarEstado(const Pieza& p, const Tablero& t, const PilaHo
 	actual = nuevo;
 }
 
+//Se peude desahcer si hay un nodo anterior al actual.
 bool ListaReplay::puedeDeshacer() const {
 	if (actual != nullptr && actual->anterior != nullptr) {
 		return true;
@@ -68,6 +73,7 @@ bool ListaReplay::puedeDeshacer() const {
 	return false;
 }
 
+//Se puede rehacer si hay un nodo siguiente al actual.
 bool ListaReplay::puedeRehacer() const {
 	if (actual != nullptr && actual->siguiente != nullptr) {
 		return true;

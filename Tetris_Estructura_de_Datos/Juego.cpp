@@ -43,6 +43,8 @@ Juego::Juego()
 
 void Juego::finalizarTurno()
 {
+    // Este metodo se ejecuta cuando la pieza ya no puede avanzar: actualiza
+    // puntaje, prepara la siguiente pieza y deja listo el siguiente turno.
     // La bomba conserva su comportamiento original y no mezcla sus filas con la animacion normal.
     if (bombaActiva)
     {
@@ -58,6 +60,8 @@ void Juego::finalizarTurno()
     int lineasBorradas = tablero.limpiarFilas();
     if (lineasBorradas > 0)
     {
+        // El puntaje depende de cuantas filas se eliminaron en el mismo turno;
+        // por eso primero se cuenta el resultado y luego se aplica la formula.
         jugadorActual.sumarLineas(lineasBorradas);
         jugadorActual.actualizarMaxCombo(lineasBorradas);
 
@@ -96,6 +100,7 @@ void Juego::finalizarTurno()
 
     if (!posicionValida(piezaActual, tablero))
     {
+        // Si la nueva pieza no cabe desde su posicion inicial, termina la partida.
         pantalla = 3;
         gestorArchivos.guardarPuntaje(jugadorActual.getNombre(), jugadorActual.getPuntaje(), metodoOrdenamiento);
     }
@@ -118,6 +123,8 @@ void Juego::dibujarPiezaAnimada(const Pieza &pieza, float desplazamientoY)
 
 void Juego::iniciarNuevaPartida()
 {
+    // Reiniciar implica limpiar tanto las estructuras del juego como los
+    // temporizadores y efectos que pertenecen a la partida anterior.
     tablero.reiniciar();
     cola.reiniciarCola();
     historial.reiniciar();
@@ -155,6 +162,8 @@ void Juego::iniciarNuevaPartida()
 
 void Juego::programarSiguienteEvento()
 {
+    // Los eventos se programan usando el tiempo acumulado de la partida;
+    // la cola se encarga de mantenerlos ordenados por tiempo de activacion.
     float proxTiempo = jugadorActual.getTiempoPartida() + GetRandomValue(35, 60);
     int proxTipo;
     do
@@ -172,6 +181,7 @@ void Juego::programarSiguienteEvento()
 
 void Juego::ejecutarEvento(Evento e)
 {
+    // El tipo del evento determina que estado temporal se activa en la partida.
     if (e.tipo == 1)
     { // 1 = Controles Invertidos
         textoAlerta = "EVENTO: CONTROLES INVERTIDOS";
@@ -210,6 +220,8 @@ void Juego::ejecutarEvento(Evento e)
 
 void Juego::actualizar(float deltaTime)
 {
+    // Cada pantalla tiene su propia logica de entrada y actualizacion.
+    // Separarlas evita que los controles de una pantalla afecten a otra.
     if (pantalla == 0)
     {
         actualizarInicio();
@@ -246,6 +258,7 @@ void Juego::actualizar(float deltaTime)
 
 void Juego::dibujar()
 {
+    // El mismo estado que decide la logica decide tambien que vista dibujar.
     if (pantalla == 0)
     {
         dibujarInicio();
@@ -370,6 +383,8 @@ void Juego::actualizarEstadisticas()
         }
         else if (CheckCollisionPointRec(raton, btnMetodo))
         {
+            // Se reordena la copia en memoria para mostrar el mismo top con
+            // cualquiera de los dos algoritmos seleccionados.
             metodoOrdenamiento = (metodoOrdenamiento == 0) ? 1 : 0;
             if (metodoOrdenamiento == 0)
             {
@@ -456,7 +471,7 @@ void Juego::actualizarComodin()
             Rectangle btn = {150.0f + (i * 80), 300.0f, 60.0f, 60.0f};
             if (CheckCollisionPointRec(raton, btn))
             {
-                // Guarda la pieza elegida para la siguiente caida
+                // Se reserva la eleccion y finalizarTurno la consumira como siguiente pieza.
                 piezaComodinReservada = opciones[i];
                 pantalla = 1;
             }
@@ -492,6 +507,7 @@ void Juego::actualizarJugando(float deltaTime)
 
     if (animandoLineas)
     {
+        // Mientras se muestra la animacion no se acepta otro turno.
         tiempoAnimacionLineas += deltaTime;
         if (tiempoAnimacionLineas >= 0.45f)
         {
@@ -513,7 +529,7 @@ void Juego::actualizarJugando(float deltaTime)
         }
     }
 
-    // 1. Alerta y tiempo de eventos
+    // 1. Actualizar efectos temporales y alertas antes de procesar controles.
     if (temporizadorAlerta > 0)
         temporizadorAlerta -= deltaTime;
 
@@ -526,6 +542,8 @@ void Juego::actualizarJugando(float deltaTime)
     tiempoCaida += deltaTime;
     if (tiempoCaida >= velocidadCaida)
     {
+        // Se intenta bajar cada pieza por separado porque el evento espejo
+        // puede dejar una pieza bloqueada antes que la otra.
         tiempoCaida = 0.0f;
         bool normalLock = false;
         bool espejoLock = false;
@@ -579,6 +597,8 @@ void Juego::actualizarJugando(float deltaTime)
             // Verificar si el turno termino por completo
             if ((piezaEspejoActiva && principalBloqueado && espejoBloqueado) || (!piezaEspejoActiva && principalBloqueado))
             {
+                // El turno termina cuando todas las piezas activas quedaron fijas.
+                // Primero se identifican las filas para poder animarlas antes de borrarlas.
 
                 filasAnimacion.clear();
                 if (bombaActiva)
@@ -612,7 +632,8 @@ void Juego::actualizarJugando(float deltaTime)
         }
     }
 
-    // Movimiento lateral y rotación invertido
+    // Movimiento lateral y rotación invertido, se traducen las teclas a intenciones.
+    //Esto permite invertir controles sin duplicar toda la logica de movimiento.
     if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT))
     {
         tiempoMovLateral += deltaTime;
@@ -687,6 +708,7 @@ void Juego::actualizarJugando(float deltaTime)
             }
             if (intentoRotar)
             {
+                // La pieza espejo rota tres veces para representar la direccion opuesta.
                 if (!principalBloqueado)
                     rotarPieza(piezaActual, tablero);
                 if (piezaEspejoActiva && !espejoBloqueado)
@@ -700,6 +722,7 @@ void Juego::actualizarJugando(float deltaTime)
             }
             if (intentoHardDrop)
             {
+                // Se repite el movimiento vertical hasta que la validacion detecta el limite.
                 if (!principalBloqueado)
                     while (moverPieza(piezaActual, 0, 1, tablero))
                         ;
@@ -722,6 +745,7 @@ void Juego::actualizarJugando(float deltaTime)
             // Cambio de pieza con Hold
             if (IsKeyPressed(KEY_C) && hold.puedeIntercambiar() && !principalBloqueado)
             {
+                // El bloqueo garantiza un solo intercambio por turno, como en Tetris.
                 if (hold.estaVacia())
                 {
                     hold.apilar(piezaActual.tipo);
@@ -786,6 +810,8 @@ void Juego::actualizarJugando(float deltaTime)
 
             if (intentarDeshacer && historial.puedeDeshacer())
             {
+                // El estado guardado contiene una copia completa del tablero y del Hold,
+                // por eso deshacer consiste en restaurar esos datos.
                 EstadoJuego deshacer = historial.deshacer();
                 piezaActual = deshacer.piezaActual;
                 for (int fila = 0; fila < 20; fila++)
