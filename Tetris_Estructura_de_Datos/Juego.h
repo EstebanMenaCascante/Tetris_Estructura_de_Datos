@@ -7,11 +7,13 @@
 #include "ListaReplay.h"
 #include "Jugador.h"
 #include "Archivo.h"
+#include "ColaEventos.h"
 #include "raylib.h"
 #include <string>
 #include <vector>
 
-class Juego {
+class Juego
+{
 private:
     Tablero tablero;
     ColaPiezas cola;
@@ -19,12 +21,28 @@ private:
     ListaReplay historial;
     Pieza piezaActual;
     Jugador jugadorActual;
-    
-    Archivo gestorArchivos;
-    int metodoOrdenamiento; // 0 = Insertion Sort, 1 = Merge Sort
-    std::vector<RegistroPuntaje> top10; // Para mostrar en la pantalla
 
-    int pantalla; 
+    Archivo gestorArchivos;
+    int metodoOrdenamiento;
+    std::vector<RegistroPuntaje> top10;
+
+    ColaEventos eventos;
+    int ultimoTipoEvento;
+    float temporizadorAlerta;
+    std::string textoAlerta;
+
+    bool controlesInvertidos;
+    float finControlesInvertidos;
+
+    bool piezaEspejoActiva;
+    Pieza piezaEspejo;
+    bool espejoBloqueado;
+    bool principalBloqueado;
+
+    bool bombaActiva;
+    char piezaComodinReservada;
+
+    int pantalla;
     float tiempoCaida;
     float velocidadCaida;
     float tiempoMovLateral;
@@ -37,29 +55,34 @@ private:
     float velocidadPelicula;
     bool peliculaPausada;
 
-    std::string nombreTemp; // Para guardar lo que el jugador teclea
-    int framesCursor; // Para hacer parpadear el cursor
+    std::string nombreTemp;
+    int framesCursor;
+
+public:
+    Juego();
 
     void cargarFotogramaPelicula();
 
+    void programarSiguienteEvento();
+    void ejecutarEvento(Evento e);
+
     void actualizarInicio();
-    void actualizarEscribirNombre(); 
+    void actualizarEscribirNombre();
     void actualizarJugando(float deltaTime);
     void actualizarPausa();
     void actualizarGameOver();
     void actualizarPelicula(float deltaTime);
     void actualizarEstadisticas();
+    void actualizarComodin();
 
     void dibujarInicio();
-    void dibujarEscribirNombre(); 
+    void dibujarEscribirNombre();
     void dibujarJugando();
     void dibujarPausa();
     void dibujarGameOver();
     void dibujarPelicula();
     void dibujarEstadisticas();
-
-public:
-    Juego();
+    void dibujarComodin();
     void actualizar(float deltaTime);
     void dibujar();
 };
