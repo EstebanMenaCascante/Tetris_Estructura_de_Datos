@@ -66,7 +66,7 @@ Las animaciones se mantienen deliberadamente sencillas:
 | Flecha izquierda | Mover a la izquierda |
 | Flecha derecha | Mover a la derecha |
 | Flecha abajo | Acelerar la caída |
-| Flecha arriba | Hard drop |
+| Flecha arriba | Rotacion |
 | `C` | Usar o intercambiar Hold |
 | `P` | Pausar o continuar |
 | `Z` | Deshacer un estado |
