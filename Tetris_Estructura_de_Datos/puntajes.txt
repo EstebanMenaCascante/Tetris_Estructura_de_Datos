@@ -1,5 +1,6 @@
 Sofia 4000
 Esteban 1500
+Carlos 1400
 Josue 475
 Josue 100
 Emena 50

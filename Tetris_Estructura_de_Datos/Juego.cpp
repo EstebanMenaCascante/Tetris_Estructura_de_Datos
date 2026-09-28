@@ -6,6 +6,10 @@ Juego::Juego()
     pantalla = 0;
     tiempoCaida = 0.0f;
     velocidadCaida = 0.5f;
+    tiempoAnimacionCaida = 0.0f;
+    animandoCaida = false;
+    tiempoAnimacionLineas = 0.0f;
+    animandoLineas = false;
     tiempoMovLateral = 0.0f;
     retardoMovimiento = 0.12f;
     tiempoReplay = 0.0f;
@@ -35,6 +39,81 @@ Juego::Juego()
     piezaActual = crearPieza(cola.desencolar());
     cola.rellenarSiEsNecesario();
     historial.registrarEstado(piezaActual, tablero, hold);
+}
+
+void Juego::finalizarTurno()
+{
+    // La bomba conserva su comportamiento original y no mezcla sus filas con la animacion normal.
+    if (bombaActiva)
+    {
+        tablero.eliminarFila(19);
+        tablero.insertarFilaVaciaInicio();
+        tablero.eliminarFila(19);
+        tablero.insertarFilaVaciaInicio();
+        jugadorActual.sumarLineas(2);
+        jugadorActual.sumarPuntaje(100);
+        bombaActiva = false;
+    }
+
+    int lineasBorradas = tablero.limpiarFilas();
+    if (lineasBorradas > 0)
+    {
+        jugadorActual.sumarLineas(lineasBorradas);
+        jugadorActual.actualizarMaxCombo(lineasBorradas);
+
+        const int PUNTAJE_BASE = 50;
+        int puntos = 0;
+
+        if (lineasBorradas == 1)
+            puntos = PUNTAJE_BASE;
+        else if (lineasBorradas == 2)
+            puntos = (2 * PUNTAJE_BASE) + (PUNTAJE_BASE / 2);
+        else if (lineasBorradas == 3)
+            puntos = (3 * PUNTAJE_BASE) + PUNTAJE_BASE;
+        else if (lineasBorradas >= 4)
+            puntos = (lineasBorradas * PUNTAJE_BASE) * 2;
+
+        jugadorActual.sumarPuntaje(puntos);
+    }
+
+    if (piezaComodinReservada != ' ')
+    {
+        piezaActual = crearPieza(piezaComodinReservada);
+        piezaComodinReservada = ' ';
+    }
+    else
+    {
+        piezaActual = crearPieza(cola.desencolar());
+        cola.rellenarSiEsNecesario();
+    }
+
+    piezaEspejoActiva = false;
+    principalBloqueado = false;
+    espejoBloqueado = false;
+
+    if (!eventos.estaVacia() && eventos.verFrente().tiempoActivacion <= jugadorActual.getTiempoPartida())
+        ejecutarEvento(eventos.desencolar());
+
+    if (!posicionValida(piezaActual, tablero))
+    {
+        pantalla = 3;
+        gestorArchivos.guardarPuntaje(jugadorActual.getNombre(), jugadorActual.getPuntaje(), metodoOrdenamiento);
+    }
+    hold.desbloquear();
+}
+
+void Juego::dibujarPiezaAnimada(const Pieza &pieza, float desplazamientoY)
+{
+    Color color = obtenerColorPieza(pieza.tipo);
+
+    for (int bloque = 0; bloque < 4; bloque++)
+    {
+        int columna = obtenerXBloque(pieza, bloque);
+        int fila = obtenerYBloque(pieza, bloque);
+        int x = 320 + columna * 28;
+        int y = 60 + (int)(fila * 28 + desplazamientoY);
+        DrawRectangle(x + 2, y + 2, 24, 24, color);
+    }
 }
 
 void Juego::programarSiguienteEvento()
@@ -299,7 +378,7 @@ void Juego::dibujarEstadisticas()
     DrawText(textoMetodo, 315, 110, 18, RAYWHITE);
 
     int y = 180;
-    for (int i = 0; i < top10.size(); i++)
+    for (int i = 0; i < static_cast<int>(top10.size()); i++)
     {
         DrawText(TextFormat("%d. %s", i + 1, top10[i].nombre.c_str()), 300, y, 25, RAYWHITE);
         DrawText(TextFormat("%d", top10[i].puntaje), 550, y, 25, YELLOW);
@@ -376,6 +455,29 @@ void Juego::actualizarJugando(float deltaTime)
     jugadorActual.sumarTiempo(deltaTime);
     bool hizoMovimiento = false;
 
+    if (animandoLineas)
+    {
+        tiempoAnimacionLineas += deltaTime;
+        if (tiempoAnimacionLineas >= 0.45f)
+        {
+            animandoLineas = false;
+            tiempoAnimacionLineas = 0.0f;
+            filasAnimacion.clear();
+            finalizarTurno();
+        }
+        return;
+    }
+
+    if (animandoCaida)
+    {
+        tiempoAnimacionCaida += deltaTime;
+        if (tiempoAnimacionCaida >= 0.10f)
+        {
+            tiempoAnimacionCaida = 0.10f;
+            animandoCaida = false;
+        }
+    }
+
     // 1. Alerta y tiempo de eventos
     if (temporizadorAlerta > 0)
         temporizadorAlerta -= deltaTime;
@@ -397,11 +499,21 @@ void Juego::actualizarJugando(float deltaTime)
         {
             if (!moverPieza(piezaActual, 0, 1, tablero))
                 normalLock = true;
+            else
+            {
+                animandoCaida = true;
+                tiempoAnimacionCaida = 0.0f;
+            }
         }
         if (piezaEspejoActiva && !espejoBloqueado)
         {
             if (!moverPieza(piezaEspejo, 0, 1, tablero))
                 espejoLock = true;
+            else
+            {
+                animandoCaida = true;
+                tiempoAnimacionCaida = 0.0f;
+            }
         }
 
         if (normalLock || espejoLock)
@@ -433,69 +545,29 @@ void Juego::actualizarJugando(float deltaTime)
             if ((piezaEspejoActiva && principalBloqueado && espejoBloqueado) || (!piezaEspejoActiva && principalBloqueado))
             {
 
-                // Bomba limpiar dos filas
+                filasAnimacion.clear();
                 if (bombaActiva)
                 {
-                    tablero.eliminarFila(19);
-                    tablero.insertarFilaVaciaInicio();
-                    tablero.eliminarFila(19);
-                    tablero.insertarFilaVaciaInicio();
-                    jugadorActual.sumarLineas(2);
-                    jugadorActual.sumarPuntaje(100);
-                    bombaActiva = false;
-                }
-
-                // Limpieza normal de filas
-                int lineasBorradas = tablero.limpiarFilas();
-                if (lineasBorradas > 0)
-                {
-                    jugadorActual.sumarLineas(lineasBorradas);
-                    jugadorActual.actualizarMaxCombo(lineasBorradas);
-
-                    const int PUNTAJE_BASE = 50;
-                    int puntos = 0;
-
-                    if (lineasBorradas == 1)
-                        puntos = PUNTAJE_BASE;
-                    else if (lineasBorradas == 2)
-                        puntos = (2 * PUNTAJE_BASE) + (PUNTAJE_BASE / 2);
-                    else if (lineasBorradas == 3)
-                        puntos = (3 * PUNTAJE_BASE) + PUNTAJE_BASE;
-                    else if (lineasBorradas >= 4)
-                        puntos = (lineasBorradas * PUNTAJE_BASE) * 2;
-
-                    jugadorActual.sumarPuntaje(puntos);
-                }
-
-                // Generar siguiente pieza
-                if (piezaComodinReservada != ' ')
-                {
-                    piezaActual = crearPieza(piezaComodinReservada);
-                    piezaComodinReservada = ' ';
+                    filasAnimacion.push_back(18);
+                    filasAnimacion.push_back(19);
                 }
                 else
                 {
-                    piezaActual = crearPieza(cola.desencolar());
-                    cola.rellenarSiEsNecesario();
+                    for (int fila = 0; fila < 20; fila++)
+                    {
+                        if (tablero.filaCompleta(fila))
+                            filasAnimacion.push_back(fila);
+                    }
                 }
 
-                // Reiniciar banderas
-                piezaEspejoActiva = false;
-                principalBloqueado = false;
-                espejoBloqueado = false;
-
-                // Activar evento solo cuando nace una nueva pieza, para evitar que se active en medio de un turno
-                if (!eventos.estaVacia() && eventos.verFrente().tiempoActivacion <= jugadorActual.getTiempoPartida())
+                if (!filasAnimacion.empty())
                 {
-                    ejecutarEvento(eventos.desencolar());
+                    animandoLineas = true;
+                    tiempoAnimacionLineas = 0.0f;
+                    return;
                 }
 
-                if (!posicionValida(piezaActual, tablero))
-                {
-                    pantalla = 3;
-                    gestorArchivos.guardarPuntaje(jugadorActual.getNombre(), jugadorActual.getPuntaje(), metodoOrdenamiento);
-                }
-                hold.desbloquear();
+                finalizarTurno();
             }
             hizoMovimiento = true;
         }
@@ -774,10 +846,26 @@ void Juego::actualizarJugando(float deltaTime)
 
             tablero.dibujar(320, 60, 28);
 
+            if (animandoLineas)
+            {
+                bool iluminar = ((int)(tiempoAnimacionLineas * 12.0f) % 2) == 0;
+                Color colorAnimacion = iluminar ? Color{255, 255, 255, 210} : Color{255, 80, 80, 180};
+                for (int fila : filasAnimacion)
+                {
+                    for (int columna = 0; columna < 10; columna++)
+                    {
+                        DrawRectangle(322 + columna * 28, 62 + fila * 28, 24, 24, colorAnimacion);
+                    }
+                }
+            }
+
             // Dibujar piezas y efectos
             if (!principalBloqueado)
             {
-                dibujarPieza(piezaActual, 320, 60, 28);
+                float desplazamientoY = 0.0f;
+                if (animandoCaida)
+                    desplazamientoY = -28.0f * (1.0f - tiempoAnimacionCaida / 0.10f);
+                dibujarPiezaAnimada(piezaActual, desplazamientoY);
                 if (bombaActiva)
                 {
                     for (int bloque = 0; bloque < 4; bloque++)
@@ -791,7 +879,10 @@ void Juego::actualizarJugando(float deltaTime)
 
             if (piezaEspejoActiva && !espejoBloqueado)
             {
-                dibujarPieza(piezaEspejo, 320, 60, 28);
+                float desplazamientoY = 0.0f;
+                if (animandoCaida)
+                    desplazamientoY = -28.0f * (1.0f - tiempoAnimacionCaida / 0.10f);
+                dibujarPiezaAnimada(piezaEspejo, desplazamientoY);
                 for (int bloque = 0; bloque < 4; bloque++)
                 {
                     int c = obtenerXBloque(piezaEspejo, bloque);

@@ -2,6 +2,7 @@
 #define PIEZA_H
 
 #include "Tablero.h"
+#include "raylib.h"
 
 struct Pieza
 {
@@ -18,6 +19,7 @@ Pieza crearPieza(char tipo);
 int obtenerIndice(char letra);
 int obtenerXBloque(const Pieza &pieza, int bloque);
 int obtenerYBloque(const Pieza &pieza, int bloque);
+Color obtenerColorPieza(char tipo);
 
 void dibujarPieza(const Pieza &pieza, int xTablero, int yTablero,int tamCelda);
 

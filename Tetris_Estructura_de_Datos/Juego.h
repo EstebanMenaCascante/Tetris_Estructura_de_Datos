@@ -45,6 +45,11 @@ private:
     int pantalla;
     float tiempoCaida;
     float velocidadCaida;
+    float tiempoAnimacionCaida;
+    bool animandoCaida;
+    float tiempoAnimacionLineas;
+    bool animandoLineas;
+    std::vector<int> filasAnimacion;
     float tiempoMovLateral;
     float retardoMovimiento;
     float tiempoReplay;
@@ -83,6 +88,8 @@ public:
     void dibujarPelicula();
     void dibujarEstadisticas();
     void dibujarComodin();
+    void finalizarTurno();
+    void dibujarPiezaAnimada(const Pieza &pieza, float desplazamientoY);
     void actualizar(float deltaTime);
     void dibujar();
 };
