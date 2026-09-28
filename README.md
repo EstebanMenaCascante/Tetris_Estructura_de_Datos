@@ -16,6 +16,7 @@ El objetivo es aplicar colas, pilas, listas enlazadas y algoritmos de ordenamien
 - Animación de parpadeo antes de eliminar líneas.
 - Sistema de puntaje, líneas totales y mejor combo.
 - Pantalla de pausa y pantalla de Game Over.
+- Botón para volver al menú inicial desde Game Over sin cerrar el programa.
 - Replay con avance, retroceso, pausa y cambio de velocidad.
 - Tabla de mejores puntajes guardada en `puntajes.txt`.
 - Eventos especiales programados durante la partida.

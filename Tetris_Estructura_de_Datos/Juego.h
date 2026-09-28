@@ -71,6 +71,7 @@ public:
     void programarSiguienteEvento();
     void ejecutarEvento(Evento e);
 
+    void iniciarNuevaPartida();
     void actualizarInicio();
     void actualizarEscribirNombre();
     void actualizarJugando(float deltaTime);

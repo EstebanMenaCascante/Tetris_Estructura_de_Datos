@@ -99,3 +99,13 @@ void ColaPiezas::rellenarSiEsNecesario()
 		generarBolsa();
 	}
 }
+
+void ColaPiezas::reiniciarCola()
+{
+	while (frente != nullptr)
+	{
+		desencolar();
+	}
+
+	generarBolsa();
+}

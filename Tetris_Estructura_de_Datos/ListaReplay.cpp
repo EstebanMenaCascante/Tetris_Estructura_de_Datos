@@ -6,11 +6,17 @@ ListaReplay::ListaReplay() {
 }
 
 ListaReplay::~ListaReplay() {
-	actual = primero; 
+	reiniciar();
+}
+
+void ListaReplay::reiniciar() {
+	actual = primero;
 	eliminarFuturo();
 	if (primero != nullptr) {
 		delete primero;
 	}
+	primero = nullptr;
+	actual = nullptr;
 }
 
 void ListaReplay::eliminarFuturo() {

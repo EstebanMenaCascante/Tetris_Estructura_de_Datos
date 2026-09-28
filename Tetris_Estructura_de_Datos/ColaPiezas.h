@@ -26,6 +26,7 @@ public:
 	char desencolar();
 	char verSiguiente(int indice) const;
 	void rellenarSiEsNecesario();
+	void reiniciarCola();
 	void generarBolsa();
 };
 

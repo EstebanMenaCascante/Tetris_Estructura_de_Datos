@@ -116,6 +116,43 @@ void Juego::dibujarPiezaAnimada(const Pieza &pieza, float desplazamientoY)
     }
 }
 
+void Juego::iniciarNuevaPartida()
+{
+    tablero.reiniciar();
+    cola.reiniciarCola();
+    historial.reiniciar();
+
+    while (!hold.estaVacia())
+        hold.desapilar();
+    hold.desbloquear();
+
+    piezaActual = crearPieza(cola.desencolar());
+    cola.rellenarSiEsNecesario();
+    historial.registrarEstado(piezaActual, tablero, hold);
+
+    tiempoCaida = 0.0f;
+    velocidadCaida = 0.5f;
+    tiempoAnimacionCaida = 0.0f;
+    animandoCaida = false;
+    tiempoAnimacionLineas = 0.0f;
+    animandoLineas = false;
+    filasAnimacion.clear();
+    tiempoMovLateral = 0.0f;
+    tiempoReplay = 0.0f;
+
+    eventos.vaciar();
+    ultimoTipoEvento = 0;
+    controlesInvertidos = false;
+    piezaEspejoActiva = false;
+    principalBloqueado = false;
+    espejoBloqueado = false;
+    bombaActiva = false;
+    piezaComodinReservada = ' ';
+    temporizadorAlerta = 0.0f;
+    textoAlerta = "";
+    nodoPelicula = nullptr;
+}
+
 void Juego::programarSiguienteEvento()
 {
     float proxTiempo = jugadorActual.getTiempoPartida() + GetRandomValue(35, 60);
@@ -254,20 +291,9 @@ void Juego::actualizarInicio()
     {
         if (CheckCollisionPointRec(raton, btnJugar))
         {
+            iniciarNuevaPartida();
             jugadorActual.reiniciarEstadisticas();
             pantalla = 1;
-
-            // Reiniciar eventos
-            eventos.vaciar();
-            ultimoTipoEvento = 0;
-            controlesInvertidos = false;
-            piezaEspejoActiva = false;
-            principalBloqueado = false;
-            espejoBloqueado = false;
-            bombaActiva = false;
-            piezaComodinReservada = ' ';
-            temporizadorAlerta = 0.0f;
-            textoAlerta = "";
 
             // Programar el primer evento de la partida (habrá un descanso inicial natural)
             programarSiguienteEvento();
@@ -398,6 +424,15 @@ void Juego::actualizarPausa()
 
 void Juego::actualizarGameOver()
 {
+    Vector2 raton = GetMousePosition();
+    Rectangle btnInicio = {300, 500, 300, 50};
+
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(raton, btnInicio))
+    {
+        pantalla = 0;
+        return;
+    }
+
     if (IsKeyPressed(KEY_R))
     {
         pantalla = 4;
@@ -957,7 +992,12 @@ void Juego::actualizarJugando(float deltaTime)
             DrawText(TextFormat("Lineas Totales: %i", jugadorActual.getLineasTotales()), 300, 380, 25, RAYWHITE);
             DrawText(TextFormat("Mejor Combo: %i lineas", jugadorActual.getMaxLineasCombo()), 300, 430, 25, YELLOW);
 
-            DrawText("Presiona [R] para ver el Replay", 250, 550, 25, LIGHTGRAY);
+            DrawText("Presiona [R] para ver el Replay", 250, 570, 22, LIGHTGRAY);
+
+            Rectangle btnInicio = {300, 500, 300, 50};
+            DrawRectangleRec(btnInicio, DARKBLUE);
+            DrawRectangleLinesEx(btnInicio, 2, SKYBLUE);
+            DrawText("VOLVER AL INICIO", 350, 515, 20, WHITE);
         }
 
         void Juego::cargarFotogramaPelicula()

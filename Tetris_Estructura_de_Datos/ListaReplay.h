@@ -22,14 +22,15 @@ struct NodoReplay {
 class ListaReplay {
 private:
 	NodoReplay* primero;
-	NodoReplay* actual; // Puntero para saber en qué momento se está (para deshacer/rehacer)
+	NodoReplay* actual; // Puntero para saber en quï¿½ momento se estï¿½ (para deshacer/rehacer)
 	
 public:
 	ListaReplay();
 	~ListaReplay();
+	void reiniciar();
 	
 	void registrarEstado(const Pieza& p, const Tablero& t, const PilaHold& h);
-	void eliminarFuturo(); // Función auxiliar para deahacer y luego rehacer
+	void eliminarFuturo(); // Funciï¿½n auxiliar para deahacer y luego rehacer
 	bool puedeDeshacer() const;
 	bool puedeRehacer() const;
 	
