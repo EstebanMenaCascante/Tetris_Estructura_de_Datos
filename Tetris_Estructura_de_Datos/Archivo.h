@@ -14,10 +14,13 @@ public:
     std::vector<RegistroPuntaje> cargarPuntajes();
     void guardarPuntaje(std::string nombre, int puntaje, int metodoOrdenamiento);
 
-    // Algoritmos de ordenamiento (públicos para poder usarlos en el menú si se quiere)
+    // Algoritmos de ordenamiento
     void insertionSort(std::vector<RegistroPuntaje>& v);
     void mergeSort(std::vector<RegistroPuntaje>& v, int inicio, int fin);
 	void merge(std::vector<RegistroPuntaje>& v, int inicio, int medio, int fin);
+	
+	//para sacar los datos para la documentacion
+	void probarOrdenamientos();
 	
 private:
     

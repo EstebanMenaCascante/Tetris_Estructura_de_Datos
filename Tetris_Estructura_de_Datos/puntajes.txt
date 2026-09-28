@@ -3,8 +3,8 @@ Esteban 1500
 Carlos 1400
 Josue 475
 Fulano 400
+Alonso 300
 Andres 150
 Erick 150
 Josue 100
 Emena 100
-Emena 50

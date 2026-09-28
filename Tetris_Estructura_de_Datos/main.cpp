@@ -1,8 +1,13 @@
 #include "Juego.h"
+#include "Archivo.h"
 #include "raylib.h"
 
 int main(int argc, char *argv[])
 {
+	
+	//Archivo medicion;
+	//medicion.probarOrdenamientos();
+	
 	InitWindow(900, 700, "Tetris - Estructuras de Datos");
 	SetTargetFPS(60);
 
